@@ -22,7 +22,6 @@ export default class Organism {
     resetOrg(){
     }
 
-
     getHasStarted(){
       return this.#hasStarted
     }
@@ -120,11 +119,11 @@ export default class Organism {
         for(var col = 0; col < this.#org.length; col++){
             let cell = this.#org[row][col]
             let livingNeighboursCells = this.#findNumberOfLivingNeighbursCells(row, col)
-            cell.determineNextGenerationStatus(livingNeighboursCells)
+            cell.determineDevelopment(livingNeighboursCells)
 
             let o = cell.getIsOverpopulated()
             let u = cell.getIsUnderpopulated()
-            let r = cell.getWillReproduce()
+            let r = cell.getIsReproducing()
 
           	if(o)
               ++this.#CellsDiedOfOverpopulation 
@@ -145,7 +144,7 @@ export default class Organism {
       cell.evolve()
       this.#incrementStats(cell)
       
-      unchanged =  unchanged && cell.getUnchanged()
+      unchanged =  unchanged && cell.getIsUnchanged()
 
       let table = document.querySelector("table")
       let td = table.rows[row].cells[col]

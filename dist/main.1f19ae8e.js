@@ -136,29 +136,34 @@ function _checkPrivateRedeclaration(obj, privateCollection) { if (privateCollect
 function _classPrivateFieldGet(s, a) { return s.get(_assertClassBrand(s, a)); }
 function _classPrivateFieldSet(s, a, r) { return s.set(_assertClassBrand(s, a), r), r; }
 function _assertClassBrand(e, t, n) { if ("function" == typeof e ? e === t : e.has(t)) return arguments.length < 3 ? t : n; throw new TypeError("Private element is not present on this object"); }
-var _nextStatus = /*#__PURE__*/new WeakMap();
 var _isAlive = /*#__PURE__*/new WeakMap();
+var _nextState = /*#__PURE__*/new WeakMap();
 var _isUnderpopulated = /*#__PURE__*/new WeakMap();
 var _isOverpopulated = /*#__PURE__*/new WeakMap();
-var _reproduce = /*#__PURE__*/new WeakMap();
-var _Unchanged = /*#__PURE__*/new WeakMap();
+var _isReproducing = /*#__PURE__*/new WeakMap();
+var _isUnchanged = /*#__PURE__*/new WeakMap();
 var _Cell_brand = /*#__PURE__*/new WeakSet();
 var Cell = exports.default = /*#__PURE__*/function () {
-  function Cell(_isAlive2) {
+  function Cell(isAlive) {
     _classCallCheck(this, Cell);
     _classPrivateMethodInitSpec(this, _Cell_brand);
-    _classPrivateFieldInitSpec(this, _nextStatus, false);
-    _classPrivateFieldInitSpec(this, _isAlive, void 0);
+    _classPrivateFieldInitSpec(this, _isAlive, false);
+    _classPrivateFieldInitSpec(this, _nextState, false);
     _classPrivateFieldInitSpec(this, _isUnderpopulated, null);
     _classPrivateFieldInitSpec(this, _isOverpopulated, null);
-    _classPrivateFieldInitSpec(this, _reproduce, null);
-    _classPrivateFieldInitSpec(this, _Unchanged, false);
-    _classPrivateFieldSet(_isAlive, this, _isAlive2);
+    _classPrivateFieldInitSpec(this, _isReproducing, null);
+    _classPrivateFieldInitSpec(this, _isUnchanged, null);
+    _classPrivateFieldSet(_isAlive, this, isAlive);
   }
   return _createClass(Cell, [{
-    key: "getUnchanged",
-    value: function getUnchanged() {
-      return _classPrivateFieldGet(_Unchanged, this);
+    key: "getIsAlive",
+    value: function getIsAlive() {
+      return _classPrivateFieldGet(_isAlive, this);
+    }
+  }, {
+    key: "getNextState",
+    value: function getNextState() {
+      return _classPrivateFieldGet(_nextState, this);
     }
   }, {
     key: "getIsUnderpopulated",
@@ -171,58 +176,66 @@ var Cell = exports.default = /*#__PURE__*/function () {
       return _classPrivateFieldGet(_isOverpopulated, this);
     }
   }, {
-    key: "getWillReproduce",
-    value: function getWillReproduce() {
-      return _classPrivateFieldGet(_reproduce, this);
+    key: "getIsReproducing",
+    value: function getIsReproducing() {
+      return _classPrivateFieldGet(_isReproducing, this);
     }
   }, {
-    key: "getIsAlive",
-    value: function getIsAlive() {
-      return _classPrivateFieldGet(_isAlive, this);
+    key: "getIsUnchanged",
+    value: function getIsUnchanged() {
+      return _classPrivateFieldGet(_isUnchanged, this);
+    }
+  }, {
+    key: "determineDevelopment",
+    value: function determineDevelopment(adjacentLivingCells) {
+      this.getIsAlive() ? _assertClassBrand(_Cell_brand, this, _isSurviving).call(this, adjacentLivingCells) : _assertClassBrand(_Cell_brand, this, _reproducing).call(this, adjacentLivingCells);
     }
   }, {
     key: "evolve",
     value: function evolve() {
-      _classPrivateFieldSet(_Unchanged, this, _classPrivateFieldGet(_isAlive, this) == _classPrivateFieldGet(_nextStatus, this));
-      _classPrivateFieldSet(_isAlive, this, _classPrivateFieldGet(_nextStatus, this));
-    }
-
-    //Rules:
-  }, {
-    key: "determineNextGenerationStatus",
-    value: function determineNextGenerationStatus(numberOfLivingNeigburs) {
-      var status = this.getIsAlive();
-      status ? _assertClassBrand(_Cell_brand, this, _isSurvivingOnToTheNextGen).call(this, numberOfLivingNeigburs) : _assertClassBrand(_Cell_brand, this, _isAliveByReproduction).call(this, numberOfLivingNeigburs);
+      var isUnchanged = this.getIsAlive() == this.getNextState();
+      _assertClassBrand(_Cell_brand, this, _setIsUnchanged).call(this, isUnchanged);
+      _assertClassBrand(_Cell_brand, this, _setIsAlive).call(this, this.getNextState());
     }
   }]);
 }();
-function _setNextStatus(nextStatus) {
-  _classPrivateFieldSet(_nextStatus, this, nextStatus);
+function _setIsAlive(bool) {
+  _classPrivateFieldSet(_isAlive, this, bool);
 }
-function _isNotUnderpopulated(livingCells) {
-  var isNotUnderpopulated = livingCells >= 2;
-  _classPrivateFieldSet(_isUnderpopulated, this, !isNotUnderpopulated);
+function _setNextState(bool) {
+  _classPrivateFieldSet(_nextState, this, bool);
+}
+function _setIsUnderpopulated(bool) {
+  _classPrivateFieldSet(_isUnderpopulated, this, bool);
+}
+function _setIsOverpopulated(bool) {
+  _classPrivateFieldSet(_isOverpopulated, this, bool);
+}
+function _setIsReproducing(bool) {
+  _classPrivateFieldSet(_isUnderpopulated, this, bool);
+}
+function _setIsUnchanged(bool) {
+  _classPrivateFieldSet(_isUnchanged, this, bool);
+}
+function _isNotUnderpopulated(adjacentLivingCells) {
+  var isNotUnderpopulated = adjacentLivingCells >= 2;
+  _assertClassBrand(_Cell_brand, this, _setIsUnderpopulated).call(this, !isNotUnderpopulated);
   return isNotUnderpopulated;
 }
-function _isNotOverpopulated(livingCells) {
-  var isNotOverpopulated = livingCells <= 3;
-  _classPrivateFieldSet(_isOverpopulated, this, !isNotOverpopulated);
+function _isNotOverpopulated(adjacentLivingCells) {
+  var isNotOverpopulated = adjacentLivingCells <= 3;
+  _assertClassBrand(_Cell_brand, this, _setIsOverpopulated).call(this, !isNotOverpopulated);
   return isNotOverpopulated;
 }
-function _willReproduce(livingCells) {
-  var willReproduce = livingCells == 3;
-  _classPrivateFieldSet(_reproduce, this, willReproduce);
-  return willReproduce;
+function _reproducing(adjacentLivingCells) {
+  var isReproducing = adjacentLivingCells == 3;
+  _assertClassBrand(_Cell_brand, this, _setIsReproducing).call(this, isReproducing);
+  _assertClassBrand(_Cell_brand, this, _setNextState).call(this, isReproducing);
+  return isReproducing;
 }
-//Any live cell with two or three live neighbors lives on to the next generation.
-function _isSurvivingOnToTheNextGen(livingCells) {
-  var isAlive = _assertClassBrand(_Cell_brand, this, _isNotUnderpopulated).call(this, livingCells) && _assertClassBrand(_Cell_brand, this, _isNotOverpopulated).call(this, livingCells);
-  _assertClassBrand(_Cell_brand, this, _setNextStatus).call(this, isAlive);
-}
-//Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-function _isAliveByReproduction(livingCells) {
-  var isAlive = _assertClassBrand(_Cell_brand, this, _willReproduce).call(this, livingCells);
-  _assertClassBrand(_Cell_brand, this, _setNextStatus).call(this, isAlive);
+function _isSurviving(adjacentLivingCells) {
+  var isSurviving = _assertClassBrand(_Cell_brand, this, _isNotUnderpopulated).call(this, adjacentLivingCells) && _assertClassBrand(_Cell_brand, this, _isNotOverpopulated).call(this, adjacentLivingCells);
+  _assertClassBrand(_Cell_brand, this, _setNextState).call(this, isSurviving);
 }
 },{}],"organism.js":[function(require,module,exports) {
 "use strict";
@@ -434,10 +447,10 @@ function _validateCurrentGeneneration() {
       var _this$CellsDiedOfOver, _this$CellsDiedOfUnde, _this$CellsRevivedByR;
       var cell = _classPrivateFieldGet(_org, this)[row][col];
       var livingNeighboursCells = _assertClassBrand(_Organism_brand, this, _findNumberOfLivingNeighbursCells).call(this, row, col);
-      cell.determineNextGenerationStatus(livingNeighboursCells);
+      cell.determineDevelopment(livingNeighboursCells);
       var o = cell.getIsOverpopulated();
       var u = cell.getIsUnderpopulated();
-      var r = cell.getWillReproduce();
+      var r = cell.getIsReproducing();
       if (o) _classPrivateFieldSet(_CellsDiedOfOverpopulation, this, (_this$CellsDiedOfOver = _classPrivateFieldGet(_CellsDiedOfOverpopulation, this), ++_this$CellsDiedOfOver));
       if (u) _classPrivateFieldSet(_CellsDiedOfUnderpopulation, this, (_this$CellsDiedOfUnde = _classPrivateFieldGet(_CellsDiedOfUnderpopulation, this), ++_this$CellsDiedOfUnde));
       if (r) _classPrivateFieldSet(_CellsRevivedByReproduction, this, (_this$CellsRevivedByR = _classPrivateFieldGet(_CellsRevivedByReproduction, this), ++_this$CellsRevivedByR));
@@ -451,7 +464,7 @@ function _evolveGeneration() {
       var cell = _classPrivateFieldGet(_org, this)[row][col];
       cell.evolve();
       _assertClassBrand(_Organism_brand, this, _incrementStats).call(this, cell);
-      unchanged = unchanged && cell.getUnchanged();
+      unchanged = unchanged && cell.getIsUnchanged();
       var table = document.querySelector("table");
       var td = table.rows[row].cells[col];
       var span = td.childNodes[0];
@@ -545,7 +558,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57650" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65225" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
