@@ -1,17 +1,23 @@
 export default class Cell {
-    #nextStatus = false
-    #isAlive
-    #isUnderpopulated = null
-    #isOverpopulated = null
-    #reproduce = null
-    #Unchanged = false
+    #isAlive = false
+    #nextState = false
+
+    #isUnderpopulated = false
+    #isOverpopulated = false
+    #isReproducing = false
+    #isUnchanged = false
+ 
     
     constructor(isAlive){
       this.#isAlive = isAlive
     }
-
-    getUnchanged(){
-      return this.#Unchanged
+    
+    getIsAlive(){
+      return this.#isAlive
+    }  
+    
+    getNextState(){
+      return this.#nextState
     }
 
     getIsUnderpopulated(){
@@ -22,58 +28,72 @@ export default class Cell {
       return this.#isOverpopulated
     }
 
-    getWillReproduce(){
-      return this.#reproduce
+    getIsReproducing(){
+      return this.#isReproducing
     }
 
-    getIsAlive(){
-      return this.#isAlive
+    getIsUnchanged(){
+      return this.#isUnchanged
     }
 
-    #setNextStatus(nextStatus){
-      this.#nextStatus = nextStatus
+    #setIsAlive(bool){
+      this.#isAlive = bool
     }
 
-    evolve(){
-      this.#Unchanged = this.#isAlive == this.#nextStatus
-      this.#isAlive = this.#nextStatus
+    #setNextState(bool){
+      this.#nextState = bool
     }
 
-    //Rules:
+    #setIsUnderpopulated(bool){
+      this.#isUnderpopulated = bool
+    }
 
-    #isNotUnderpopulated(livingCells){
-      let isNotUnderpopulated = livingCells >= 2  
-      this.#isUnderpopulated = !isNotUnderpopulated
+    #setIsOverpopulated(bool){
+      this.#isOverpopulated = bool
+    }
+
+    #setIsReproducing(bool){
+      this.#isReproducing = bool
+    }
+
+    #setIsUnchanged(bool){
+      this.#isUnchanged = bool
+    }
+
+
+
+    #isNotUnderpopulated(adjacentLivingCells){
+      let isNotUnderpopulated = adjacentLivingCells >= 2  
+      this.#setIsUnderpopulated(!isNotUnderpopulated)
       return isNotUnderpopulated
     }
 
-    #isNotOverpopulated(livingCells){
-      let isNotOverpopulated = livingCells <= 3  
-      this.#isOverpopulated = !isNotOverpopulated
+    #isNotOverpopulated(adjacentLivingCells){
+      let isNotOverpopulated = adjacentLivingCells <= 3  
+      this.#setIsOverpopulated(!isNotOverpopulated)
       return isNotOverpopulated
     }
 
-    #willReproduce(livingCells){
-      let willReproduce = livingCells == 3
-      this.#reproduce = willReproduce
-      return willReproduce
+    #reproducing(adjacentLivingCells){
+      let isReproducing = adjacentLivingCells == 3
+      this.#setIsReproducing(isReproducing)   
+      this.#setNextState(isReproducing)
+      return isReproducing
     }
 
-  //Any live cell with two or three live neighbors lives on to the next generation.
-    #isSurvivingOnToTheNextGen(livingCells){    
-      let isAlive =  this.#isNotUnderpopulated(livingCells) && this.#isNotOverpopulated(livingCells)
-      this.#setNextStatus(isAlive)
+    #isSurviving(adjacentLivingCells){    
+      let isSurviving =  this.#isNotUnderpopulated(adjacentLivingCells) && this.#isNotOverpopulated(adjacentLivingCells)
+      this.#setNextState(isSurviving)
     }
 
-  //Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-    #isAliveByReproduction(livingCells){
-      let isAlive = this.#willReproduce(livingCells)
-      this.#setNextStatus(isAlive)
+
+    determineDevelopment(adjacentLivingCells){
+      this.getIsAlive() ? this.#isSurviving(adjacentLivingCells) : this.#reproducing(adjacentLivingCells)
     }
 
-    determineNextGenerationStatus(numberOfLivingNeigburs){
-      let status = this.getIsAlive();  
-      status ? this.#isSurvivingOnToTheNextGen(numberOfLivingNeigburs) 
-      : this.#isAliveByReproduction(numberOfLivingNeigburs)
+    evolve(){
+      let isUnchanged = this.getIsAlive() == this.getNextState()
+      this.#setIsUnchanged(isUnchanged)
+      this.#setIsAlive(this.getNextState())
     }
   }
