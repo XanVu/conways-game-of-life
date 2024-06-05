@@ -1,60 +1,69 @@
 'use strict';
-import HtmlHandler from './HtmlHandler';
 import Organism from './organism';
 
-   
-    HtmlHandler.registerTabs()
-    HtmlHandler.registerControls()
-
+let or = new Organism(10)
     
-    let table = Organism.initEvolution(10)
-    HtmlHandler.initHtmlTable(table, 10)
+    let tab1 = document.getElementById("tab1")
+    let tab2 = document.getElementById("tab2")
+    let tab3 = document.getElementById("tab3")
 
-    export default class Test {
+  
 
-    static async test(){
-        let repetitionCounter = 0
- 
+
+    let startButton = document.getElementById("start")
+
+    startButton.addEventListener("click", function(){
+            or.setHasStarted(true) 
+            or.cycleOfLife() 
+    }, false)
+
+
+    let stopButton = document.getElementById("stop")
+
+    stopButton.addEventListener("click", function(){
+            or.setStopped(true) 
+    }, false)
+
+
+    let resetButton = document.getElementById("reset")
+
+    resetButton.addEventListener("click", function(){
+            or.resetOrg()
+            or.cycleOfLife() 
+    }, false)
+
+
+    let stats = document.getElementById("Stats")
+    let rules = document.getElementById("Rules")
+    let settings = document.getElementById("Definition")
+
+
+
+    tab1.addEventListener("click", function(){
+        if(stats.style.display === "none"){
+            stats.style.display = "block" 
+        }
+        else
+        stats.style.display = "none"
+    }, false)
+
+    tab2.addEventListener("click", function(){
+        if(rules.style.display === "none"){
+            rules.style.display = "block" 
+        }
+        else
+        rules.style.display = "none"
+    }, false)
+
+    tab3.addEventListener("click", function(){
+        if(settings.style.display === "none"){
+            settings.style.display = "block" 
+        }
+        else
+        settings.style.display = "none"
+    }, false)
     
-    const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-    
-
-        console.log(Organism.getIsRepeating())
 
 
-        while(Organism.getIsAlive() && Organism.getHasStarted() && !Organism.getHasStopped() && !Organism.getIsStable() && !Organism.getIsRepeating()){   
-          let table = Organism.getTable()
-          
-          let x = Organism.getDeadCellPerIteration()
-          let y = Organism.getLivingCellPerIteration()
-          
-          Organism.validateStock(table)
-          Organism.evolveGeneration(table)
-          HtmlHandler.updateHtmlSpanInTable(table)
-          HtmlHandler.setHtmlStatValues()
-             
-          await sleep(Organism.getInterval())
-    
-          let x1 = Organism.getDeadCellPerIteration()
-          let y1 = Organism.getLivingCellPerIteration()  
-
-
-          if(x == x1 && y == y1){
-            ++repetitionCounter
-          }
-
-          if(repetitionCounter > 3){
-            Organism.setIsRepeating(true)
-          }
-        
-          Organism.setIteration()
-          Organism.resetIterationStatsCounter();
-
-
-
-
-        }  
-    }
-}
 
 
