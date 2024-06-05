@@ -12,7 +12,6 @@ p {
   padding-right: 25%;
 } 
 
-
 h1 {
   font-size: 2em;
   margin: 0.67em 0;
@@ -74,12 +73,9 @@ h1 {
 .tabcontent {
   display: none;
   padding: 6px 12px;
-  border: 1px solid #ccc;
   border-top: none;
   text-align: center;
 }
-
-
 
 
 /* Opinionated CSS defaults based on:
