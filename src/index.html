@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>A JavaScript project</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+  <h1>Conway's Game of Life</h1>
+
+  <!-- Tab links -->
+<div class="tab">
+  <button id="tab1">Stats</button>
+  <button id="tab2">Basic Rules</button>
+  <button id="tab3">Definition</button>
+  <button id="start">Start</button>
+  <button id="stop">Stop</button>
+  <button id="reset">Reset</button>
+</div>
+
+<!-- Tab content -->
+<div id="Stats" class="tabcontent" style="display: none;">
+  <h3>Stats</h3>
+  <div>
+    <p id="iteration"></p> 
+    <p id="currentLivingCells"></p>
+    <p id="currentDeadCells"></p>
+
+
+    <p id="underpopulation"></p>
+    <p id="overpopulation"></p>
+    <p id="reproduction"></p>
+    </div> 
+</div>
+
+<div id="Rules" class="tabcontent" style="display: none;">
+  <h3>Basic Rules of the Conway's game of life</h3>
+  <p>1. Any live cell with fewer than two live neighbors dies, as if by underpopulation.</p>
+   <p>2. Any live cell with two or three live neighbors lives on to the next generation.</p>
+   <p>3. Any live cell with more than three live neighbors dies, as if by overpopulation.</p>
+   <p>4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.</p>
+</div>
+
+<div id="Definition" class="tabcontent" style="display: none;">
+  <h3>Definition</h3>
+  <p>The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. It is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and observing how it evolves. It is Turing complete and can simulate a universal constructor or any other Turing machine.</p>
+</div>
+
+<div style="display: flex; justify-content: center; align-items: center;">
+  <table>
+  </table>
+</div>
+
+</body>
+<script src="main.js"></script>
+</html>
