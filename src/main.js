@@ -1,37 +1,30 @@
 'use strict';
 import Organism from './organism';
 
-let or = new Organism(10)
-    
+
+
+
+
     let tab1 = document.getElementById("tab1")
     let tab2 = document.getElementById("tab2")
     let tab3 = document.getElementById("tab3")
-
-  
-
-
+   
     let startButton = document.getElementById("start")
 
     startButton.addEventListener("click", function(){
-            or.setHasStarted(true) 
-            or.cycleOfLife() 
+        Organism.setHasStarted(true)
+        test()
     }, false)
 
 
     let stopButton = document.getElementById("stop")
 
     stopButton.addEventListener("click", function(){
-            or.setStopped(true) 
+        Organism.setStopped(true) 
     }, false)
 
 
     let resetButton = document.getElementById("reset")
-
-    resetButton.addEventListener("click", function(){
-            or.resetOrg()
-            or.cycleOfLife() 
-    }, false)
-
 
     let stats = document.getElementById("Stats")
     let rules = document.getElementById("Rules")
@@ -65,5 +58,43 @@ let or = new Organism(10)
     
 
 
+    
+Organism.setSize(10)
+let size = Organism.getSize()
+Organism.initTable()    
+let table = Organism.getTable()
+Organism.startingLive(table)
+Organism.initHtmlTable(table, size)
+
+
+  
+
+
+    async function test(){
+
+    var organismIsDead = false
+    
+    
+
+    const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+    
+
+        while(!organismIsDead && Organism.getHasStarted() && !Organism.getHasStopped() && !Organism.getIsStable()){   
+          let table = Organism.getTable()
+          Organism.validateStock(table)
+          Organism.evolveGeneration(table)
+          Organism.updateHtmlSpanInTable(table)
+          Organism.setHtmlStatValues()
+    
+          if(Organism.getLivingCellPerIteration() == 0){
+            organismIsDead = true
+          }
+          
+          await sleep(Organism.getInterval())
+    
+          Organism.setIteration()
+          Organism.resetIterationCounter();
+        }  
+    }
 
 

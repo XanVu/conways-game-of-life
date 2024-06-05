@@ -2,10 +2,10 @@ export default class Cell {
     #isAlive = false
     #nextState = false
 
-    #isUnderpopulated = null
-    #isOverpopulated = null
-    #isReproducing = null
-    #isUnchanged = null
+    #isUnderpopulated = false
+    #isOverpopulated = false
+    #isReproducing = false
+    #isUnchanged = false
  
     
     constructor(isAlive){
@@ -53,7 +53,7 @@ export default class Cell {
     }
 
     #setIsReproducing(bool){
-      this.#isUnderpopulated = bool
+      this.#isReproducing = bool
     }
 
     #setIsUnchanged(bool){
@@ -76,7 +76,7 @@ export default class Cell {
 
     #reproducing(adjacentLivingCells){
       let isReproducing = adjacentLivingCells == 3
-      this.#setIsReproducing(isReproducing)
+      this.#setIsReproducing(isReproducing)   
       this.#setNextState(isReproducing)
       return isReproducing
     }

@@ -1,158 +1,253 @@
 import Cell from "./cell.js";
 
 export default class Organism {
-    #livingCellsPerIteration = 0
-    #deadCellsPerIteration = 0
-    #CellsDiedOfOverpopulation = 0
-    #CellsDiedOfUnderpopulation = 0
-    #CellsRevivedByReproduction = 0
-    #iteration = 0
-    #org
-    #size
-    #interval = 100
-    #hasStarted = false
-    #stopped = false
-    #stable = false
+    static #table
+    //controls
+    static #size = 0
+    static #interval = 100
 
-    constructor(size){
-      this.#size = size
-      this.#org = this.#startingLive()
+    //Stats
+    static #iteration = 0
+    static #livingCellsPerIteration = 0
+    static #deadCellsPerIteration = 0
+
+    static #fatalitiesOfOverpopulation = 0
+    static #fatalitiesOfUnderpopulation = 0
+    static #reproducedCells = 0
+
+    //Loop Cooditions
+    static #hasStarted = false
+    static #hasStopped = false
+    static #isStable = false
+
+    static getTable(){
+      return this.#table
     }
 
-    resetOrg(){
+    static getSize(){
+      return this.#size
     }
 
-    getHasStarted(){
+    static getInterval(){
+      return this.#interval
+    }
+
+    static getTable(){
+      return this.#table
+    }
+
+    static getIteration(){
+      return this.#iteration
+    }
+
+    static getLivingCellPerIteration(){
+      return this.#livingCellsPerIteration
+    }
+
+    static getDeadCellPerIteration(){
+      return this.#deadCellsPerIteration
+    }
+
+    static getFatalitiesOfOverpopulation(){
+      return this.#fatalitiesOfOverpopulation
+    }
+
+    static getFatalitiesOfUnderpopulation(){
+      return this.#fatalitiesOfUnderpopulation
+    }
+
+    static getReproducedCells(){
+      return this.#reproducedCells
+    }
+
+    static getHasStarted(){
       return this.#hasStarted
     }
 
-    setHasStarted(){
-      this.#hasStarted = true
+    static getHasStopped(){
+      return this.#hasStopped
     }
 
-    setStopped(){
-      this.#stopped = true
+    static getIsStable(){
+      return this.#isStable
     }
 
-    setInterval(interval){
+    static setSize(size){
+       this.#size = size 
+    }
+
+    static setTable(table){
+      this.#table = table 
+    } 
+
+    static getInterval(interval){
       this.#interval = interval
     }
 
-    #resetCurrentEvolutionCounter(){
-      this.#deadCellsPerIteration = 0
-      this.#livingCellsPerIteration = 0
+    static getHasStarted(){
+      return this.#hasStarted
     }
 
-    #isEqualToIdentityCoordinates(row, col, array){
+    static setHasStarted(){
+      this.#hasStarted = true
+    }
+
+    static setStopped(){
+      this.#hasStopped = true
+    }
+
+    static setInterval(interval){
+      this.#interval = interval
+    }
+
+    static setIteration(){
+     ++this.#iteration
+    }
+
+
+    static initTable(){
+      let size = this.getSize()
+      let table =  Array.from(new Array(size), () => new Array(size))
+      this.setTable(table)
+    }
+
+    static startingLive(array){
+      for(var row = 0; row < array.length; row++){
+        for(var col = 0; col < array.length; col++){
+          let cell = this.#CreateCell()
+          array[row][col] = cell
+          this.#setIterationCounter(cell)
+        }
+      }
+      return array
+    }
+
+    static #CreateCell(){
+      return (Math.random() > 0.5) ? new Cell(true) : new Cell(false)
+     }
+
+    static validateStock(array){
+      for(var row = 0; row < array.length; row++){
+        for(var col = 0; col < array.length; col++){
+            let cell = array[row][col]
+            let livingAdjacentCells = this.#livingAdjacentCells(row, col)
+            cell.determineDevelopment(livingAdjacentCells)
+            this.#updateStatsForCells(cell)
+      }
+    }
+  }
+
+  static #livingAdjacentCells(row, col){
+    let adjacentCellCoordinates = this.#getAdjacentCellCoordinates(row, col)
+    let adjacentCells = adjacentCellCoordinates.map(coordinate => this.#getCellbyCoordinate(coordinate))
+    return this.#calculateNumberOfLivingAdjacentCells(adjacentCells)
+  }
+
+  static #getAdjacentCellCoordinates(row, col){
+    let size = this.getSize()
+    let columns = Array((col - 1), col, ( col + 1)).map(index => this.#calculateValidIndex(index, size))
+    let rows = Array((row - 1), row, (row + 1)).map(index => this.#calculateValidIndex(index, size)) 
+    let cartesianProduct = rows.flatMap(row => columns.map(column => Array(row, column)))
+    let adjacentCells = cartesianProduct.filter(coordinateArray => !this.#isIdentity(row, col, coordinateArray))
+    return adjacentCells
+    }
+
+    static #calculateValidIndex(index, size){
+      return this.#mod(index, size)
+     }
+  
+    static #mod(a,b){
+      return a - (Math.floor(a / b) * b)
+    }
+
+    static #isIdentity(row, col, array){
       let identity = Array(row, col)
       return array.every((element, index) => element === identity[index]);
     }
 
-    #getNeighbursCoordinates(row, col){
-    let columns = this.#sanitizeArrayIndecies(Array((col - 1), col, ( col + 1)))
-    let rows = this.#sanitizeArrayIndecies(Array((row - 1), row, (row + 1)))
-    let cartesianProduct = rows.flatMap(row => columns.map(column => Array(row, column)))
-    let cartesianProductWithoutIdentity = cartesianProduct.filter(coordinateArray => !this.#isEqualToIdentityCoordinates(row, col, coordinateArray))
-    return cartesianProductWithoutIdentity
-  }
-
-  #getCellbyCoordinate(coordinate){
+  static #getCellbyCoordinate(coordinate){
     let row = coordinate[0]
     let col = coordinate[1]
-    return this.#org[row][col]
+    return this.#table[row][col]
   }
 
-  #sanitizeArrayIndecies(array){
-    return array.map(value => value - (Math.floor(value / this.#size) * this.#size));
+  static #calculateNumberOfLivingAdjacentCells(adjacentCells){
+    return adjacentCells.reduce((acc, cell) => {
+      return cell.getIsAlive() ? ++acc : acc}, 0);
   }
 
-  #startingLive(){
-    let array =  Array.from(new Array(this.#size), () => new Array(this.#size))
-      let table = document.querySelector("table");
+  static #updateStatsForCells(cell){
+    if(cell.getIsOverpopulated())
+      ++this.#fatalitiesOfOverpopulation
 
-      for(var row = 0; row < array.length; row++){
+    if(cell.getIsUnderpopulated())
+      ++this.#fatalitiesOfUnderpopulation  
 
-        let r = table.insertRow()
-
-        for(var col = 0; col < array.length; col++){
-          let cell = this.#GeneratingLife()
-          this.#incrementStats(cell)
-          array[row][col] = cell
-          let ce = r.insertCell()
-
-          var container = document.createElement("span")
-          
-          if(cell.getIsAlive())
-            container.classList.add("greenCircle");
-          else
-          container.classList.add("blackCircle")
-          
-      
-          ce.appendChild(container)
-        }
-      }
-      
-      
-      this.#setHtmlStatValues()
-      this.#setHmtlIterationValue();
-      return array
-    }
-
-    #incrementStats(cell){
-      cell.getIsAlive() == true ? this.#livingCellsPerIteration++ : this.#deadCellsPerIteration++
-    }
-
-    #findNumberOfLivingNeighbursCells(row, col){
-      let neighburCellCoordinates = this.#getNeighbursCoordinates(row, col)
-      let cellNeighburs = neighburCellCoordinates.map(x => this.#getCellbyCoordinate(x))
-      return cellNeighburs.reduce((acc, cell) => {
-              return cell.getIsAlive() ? ++acc : acc     
-      }, 0);
-    }
-
-    #GeneratingLife(){
-     return (Math.random() > 0.5) ? new Cell(true) : new Cell(false)
-    }
-
-    #validateCurrentGeneneration(){
-      for(var row = 0; row < this.#org.length; row++){
-        for(var col = 0; col < this.#org.length; col++){
-            let cell = this.#org[row][col]
-            let livingNeighboursCells = this.#findNumberOfLivingNeighbursCells(row, col)
-            cell.determineDevelopment(livingNeighboursCells)
-
-            let o = cell.getIsOverpopulated()
-            let u = cell.getIsUnderpopulated()
-            let r = cell.getIsReproducing()
-
-          	if(o)
-              ++this.#CellsDiedOfOverpopulation 
-              if(u)
-                ++this.#CellsDiedOfUnderpopulation
-                if(r)
-                  ++this.#CellsRevivedByReproduction
-      }
-    }
+    if(cell.getIsReproducing())
+      ++this.#reproducedCells  
   }
   
-  #evolveGeneration(){
-    let unchanged = true
+  static evolveGeneration(array){
+    let acc = true
 
-    for(var row = 0; row < this.#org.length; row++){
-      for(var col = 0; col < this.#org.length; col++){
-      const cell = this.#org[row][col]
+    for(var row = 0; row < array.length; row++){
+      for(var col = 0; col < array.length; col++){
+      const cell = this.#table[row][col]
       cell.evolve()
-      this.#incrementStats(cell)
-      
-      unchanged =  unchanged && cell.getIsUnchanged()
+      this.#setIterationCounter(cell)
+      acc =  this.#validateUnchangedState(acc, cell.getIsUnchanged())      
+      }
+    }  
 
-      let table = document.querySelector("table")
-      let td = table.rows[row].cells[col]
+    this.#isStable = acc
+  }
 
-      let span = td.childNodes[0]
+  static #setIterationCounter(cell){
+    cell.getIsAlive() == true ? ++this.#livingCellsPerIteration : ++this.#deadCellsPerIteration
+  }
+
+  static #validateUnchangedState(acc, isUnchanged){
+    return acc && isUnchanged
+  }
 
 
-      if(cell.getIsAlive()){ 
+//HTML STUFF
+
+  static initHtmlTable(array, size) {
+    let table = document.querySelector("table");
+
+    for(var row = 0; row < size; row++){
+        let r = table.insertRow()
+     
+        for(var col = 0; col < size; col++){
+            let cell = array[row][col]
+        
+            let c = r.insertCell()
+            let span = document.createElement("span")             
+            c.appendChild(span)
+            this.#setColorOfSpan(span, cell)
+       }
+    }
+
+    this.setHtmlStatValues()
+}
+
+  static updateHtmlSpanInTable(array){
+    for(var row = 0; row < array.length; row++){
+      for(var col = 0; col < array.length; col++){
+        let cell = array[row][col]
+
+        let table = document.querySelector("table")
+        let td = table.rows[row].cells[col]
+        let span = td.childNodes[0]
+
+        this.#setColorOfSpan(span, cell)
+      }
+    }
+  }
+
+  static #setColorOfSpan(span, cell){
+    if(cell.getIsAlive()){ 
         span.classList.remove(...span.classList)
         span.classList.add("greenCircle")
       }
@@ -160,60 +255,19 @@ export default class Organism {
         span.classList.remove(...span.classList)
         span.classList.add("blackCircle")
       }
-      }
-    }  
+}
 
-    this.#stable = unchanged
+static setHtmlStatValues(){
+  document.getElementById("underpopulation").innerHTML = "Cell died of Underpopulation: " + Organism.getFatalitiesOfUnderpopulation() 
+  document.getElementById("overpopulation").innerHTML = "Cell died of Overpopulation: " + Organism.getFatalitiesOfOverpopulation() 
+  document.getElementById("reproduction").innerHTML = "Cells reproduced: " +  Organism.getReproducedCells()
+  document.getElementById("currentLivingCells").innerHTML = "Current Living Cells: " + Organism.getLivingCellPerIteration() 
+  document.getElementById("currentDeadCells").innerHTML = "Current Dead Cells: " + Organism.getDeadCellPerIteration()   
+  document.getElementById("iteration").innerHTML = "Cell Iteration: " + Organism.getIteration()
+}
 
-    this.#setHtmlStatValues();
-  
-  }
-
-  #setHtmlStatValues(){
-    document.getElementById("underpopulation").innerHTML = "Cell died of Underpopulation: " + this.#CellsDiedOfUnderpopulation 
-    document.getElementById("overpopulation").innerHTML = "Cell died of Overpopulation: " + this.#CellsDiedOfOverpopulation
-    document.getElementById("reproduction").innerHTML = "Cells reproduced: " +  this.#CellsRevivedByReproduction
-    document.getElementById("currentLivingCells").innerHTML = "Current Living Cells: " + this.#livingCellsPerIteration 
-    document.getElementById("currentDeadCells").innerHTML = "Current Dead Cells: " + this.#deadCellsPerIteration 
-
-  }
-
-  #setHmtlIterationValue(){
-    document.getElementById("iteration").innerHTML = "Cell Iteration: " + this.#iteration
-  }
-
-
-
-
-  async cycleOfLife(){
-    var organismIsDead = false
-
-
-    const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-
-
-    while(!organismIsDead && this.#hasStarted && !this.#stopped && !this.#stable){   
-      this.#validateCurrentGeneneration()
-
-
-
-
-
-
-
-      this.#evolveGeneration()
-
-      if(this.#livingCellsPerIteration == 0){
-        organismIsDead = true
-      }
-      
-    
-      await sleep(this.#interval)
-
-
-      this.#iteration++
-      this.#resetCurrentEvolutionCounter();
-      this.#setHmtlIterationValue();
-    }  
+  static resetIterationCounter(){
+    this.#deadCellsPerIteration = 0
+    this.#livingCellsPerIteration = 0
   }
 }
