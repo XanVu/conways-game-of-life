@@ -19,6 +19,8 @@ export default class Organism {
     static #hasStarted = false
     static #hasStopped = false
     static #isStable = false
+    static #isAlive = true
+    static #isRepeating = false
 
     static getTable(){
       return this.#table
@@ -72,6 +74,14 @@ export default class Organism {
       return this.#isStable
     }
 
+    static getIsAlive(){
+      return this.#isAlive
+    }
+
+    static getIsRepeating(){
+      return this.#isRepeating
+    }
+
     static setSize(size){
        this.#size = size 
     }
@@ -104,6 +114,14 @@ export default class Organism {
      ++this.#iteration
     }
 
+    static setIsAlive(bool){
+      this.#isAlive = bool
+    }
+
+    static setIsRepeating(bool){
+      this.#isRepeating = bool
+    }
+
 
     static initTable(){
       let size = this.getSize()
@@ -116,7 +134,7 @@ export default class Organism {
         for(var col = 0; col < array.length; col++){
           let cell = this.#CreateCell()
           array[row][col] = cell
-          this.#setIterationCounter(cell)
+          this.#setIterationStatsCounter(cell)
         }
       }
       return array
@@ -194,7 +212,7 @@ export default class Organism {
       for(var col = 0; col < array.length; col++){
       const cell = this.#table[row][col]
       cell.evolve()
-      this.#setIterationCounter(cell)
+      this.#setIterationStatsCounter(cell)
       acc =  this.#validateUnchangedState(acc, cell.getIsUnchanged())      
       }
     }  
@@ -202,7 +220,7 @@ export default class Organism {
     this.#isStable = acc
   }
 
-  static #setIterationCounter(cell){
+  static #setIterationStatsCounter(cell){
     cell.getIsAlive() == true ? ++this.#livingCellsPerIteration : ++this.#deadCellsPerIteration
   }
 
@@ -210,64 +228,17 @@ export default class Organism {
     return acc && isUnchanged
   }
 
-
-//HTML STUFF
-
-  static initHtmlTable(array, size) {
-    let table = document.querySelector("table");
-
-    for(var row = 0; row < size; row++){
-        let r = table.insertRow()
-     
-        for(var col = 0; col < size; col++){
-            let cell = array[row][col]
-        
-            let c = r.insertCell()
-            let span = document.createElement("span")             
-            c.appendChild(span)
-            this.#setColorOfSpan(span, cell)
-       }
-    }
-
-    this.setHtmlStatValues()
-}
-
-  static updateHtmlSpanInTable(array){
-    for(var row = 0; row < array.length; row++){
-      for(var col = 0; col < array.length; col++){
-        let cell = array[row][col]
-
-        let table = document.querySelector("table")
-        let td = table.rows[row].cells[col]
-        let span = td.childNodes[0]
-
-        this.#setColorOfSpan(span, cell)
-      }
-    }
-  }
-
-  static #setColorOfSpan(span, cell){
-    if(cell.getIsAlive()){ 
-        span.classList.remove(...span.classList)
-        span.classList.add("greenCircle")
-      }
-      else{
-        span.classList.remove(...span.classList)
-        span.classList.add("blackCircle")
-      }
-}
-
-static setHtmlStatValues(){
-  document.getElementById("underpopulation").innerHTML = "Cell died of Underpopulation: " + Organism.getFatalitiesOfUnderpopulation() 
-  document.getElementById("overpopulation").innerHTML = "Cell died of Overpopulation: " + Organism.getFatalitiesOfOverpopulation() 
-  document.getElementById("reproduction").innerHTML = "Cells reproduced: " +  Organism.getReproducedCells()
-  document.getElementById("currentLivingCells").innerHTML = "Current Living Cells: " + Organism.getLivingCellPerIteration() 
-  document.getElementById("currentDeadCells").innerHTML = "Current Dead Cells: " + Organism.getDeadCellPerIteration()   
-  document.getElementById("iteration").innerHTML = "Cell Iteration: " + Organism.getIteration()
-}
-
-  static resetIterationCounter(){
+  static resetIterationStatsCounter(){
     this.#deadCellsPerIteration = 0
     this.#livingCellsPerIteration = 0
+  }
+
+  static initEvolution(size){
+      this.setSize(size)
+      this.initTable()
+
+      let table = this.getTable()
+
+      return this.startingLive(table)
   }
 }
