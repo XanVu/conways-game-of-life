@@ -259,6 +259,26 @@ var Organism = exports.default = /*#__PURE__*/function () {
     _classCallCheck(this, Organism);
   }
   return _createClass(Organism, null, [{
+    key: "getPreviousLivingCellsPerIteration",
+    value: function getPreviousLivingCellsPerIteration() {
+      return _assertClassBrand(Organism, this, _previousLivingCellsPerIteration)._;
+    }
+  }, {
+    key: "getPreviousDeadCellsPerIteration",
+    value: function getPreviousDeadCellsPerIteration() {
+      return _assertClassBrand(Organism, this, _previousDeadCellsPerIteration)._;
+    }
+  }, {
+    key: "getRepetitionCounter",
+    value: function getRepetitionCounter() {
+      return _assertClassBrand(Organism, this, _repetitionCounter)._;
+    }
+  }, {
+    key: "getRepetitionThreshold",
+    value: function getRepetitionThreshold() {
+      return _assertClassBrand(Organism, this, _repetitionThreshold)._;
+    }
+  }, {
     key: "getTable",
     value: function getTable() {
       return _assertClassBrand(Organism, this, _table)._;
@@ -370,6 +390,33 @@ var Organism = exports.default = /*#__PURE__*/function () {
       _isRepeating._ = _assertClassBrand(Organism, this, bool);
     }
   }, {
+    key: "setRepetitionCounter",
+    value: function setRepetitionCounter() {
+      var _this$repetitionCount;
+      _repetitionCounter._ = _assertClassBrand(Organism, this, (_this$repetitionCount = _assertClassBrand(Organism, this, _repetitionCounter)._, ++_this$repetitionCount));
+    }
+  }, {
+    key: "resetRepetitionCounter",
+    value: function resetRepetitionCounter() {
+      _repetitionCounter._ = _assertClassBrand(Organism, this, 0);
+    }
+  }, {
+    key: "setPreviousLivingCellsPerIteration",
+    value: function setPreviousLivingCellsPerIteration(number) {
+      _previousLivingCellsPerIteration._ = _assertClassBrand(Organism, this, number);
+    }
+  }, {
+    key: "setPreviousDeadCellsPerIteration",
+    value: function setPreviousDeadCellsPerIteration(number) {
+      _previousDeadCellsPerIteration._ = _assertClassBrand(Organism, this, number);
+    }
+  }, {
+    key: "resetIterationStatsCounter",
+    value: function resetIterationStatsCounter() {
+      _deadCellsPerIteration._ = _assertClassBrand(Organism, this, 0);
+      _livingCellsPerIteration._ = _assertClassBrand(Organism, this, 0);
+    }
+  }, {
     key: "initTable",
     value: function initTable() {
       var size = this.getSize();
@@ -417,10 +464,12 @@ var Organism = exports.default = /*#__PURE__*/function () {
       _isStable._ = _assertClassBrand(Organism, this, acc);
     }
   }, {
-    key: "resetIterationStatsCounter",
-    value: function resetIterationStatsCounter() {
-      _deadCellsPerIteration._ = _assertClassBrand(Organism, this, 0);
-      _livingCellsPerIteration._ = _assertClassBrand(Organism, this, 0);
+    key: "setPreviousIterationStatsCounter",
+    value: function setPreviousIterationStatsCounter() {
+      var currentDeadCells = this.getDeadCellPerIteration();
+      var currentLivingCells = this.getLivingCellPerIteration();
+      this.setPreviousLivingCellsPerIteration(currentLivingCells);
+      this.setPreviousDeadCellsPerIteration(currentDeadCells);
     }
   }, {
     key: "initEvolution",
@@ -429,6 +478,23 @@ var Organism = exports.default = /*#__PURE__*/function () {
       this.initTable();
       var table = this.getTable();
       return this.startingLive(table);
+    }
+  }, {
+    key: "detectRepetition",
+    value: function detectRepetition() {
+      var previousDeadCells = this.getPreviousDeadCellsPerIteration();
+      var previousLivingCells = this.getPreviousLivingCellsPerIteration();
+      var currentDeadCells = this.getDeadCellPerIteration();
+      var currentLivingCells = this.getLivingCellPerIteration();
+      previousDeadCells == currentDeadCells && previousLivingCells == currentLivingCells ? this.setRepetitionCounter() : this.resetRepetitionCounter();
+      _assertClassBrand(Organism, this, _validateRepetitionCondition).call(this);
+    }
+  }, {
+    key: "x",
+    value: function x() {
+      if (Organism.getLivingCellPerIteration() == 0) {
+        Organism.setIsAlive(false);
+      }
     }
   }]);
 }();
@@ -498,6 +564,11 @@ function _setIterationStatsCounter(cell) {
 function _validateUnchangedState(acc, isUnchanged) {
   return acc && isUnchanged;
 }
+function _validateRepetitionCondition() {
+  if (this.getRepetitionCounter() > this.getRepetitionThreshold()) {
+    this.setIsRepeating(true);
+  }
+}
 var _table = {
   _: void 0
 };
@@ -507,6 +578,12 @@ var _size = {
 };
 var _interval = {
   _: 100
+};
+var _repetitionCounter = {
+  _: 0
+};
+var _repetitionThreshold = {
+  _: 5
 };
 //Stats
 var _iteration = {
@@ -525,6 +602,12 @@ var _fatalitiesOfUnderpopulation = {
   _: 0
 };
 var _reproducedCells = {
+  _: 0
+};
+var _previousLivingCellsPerIteration = {
+  _: 0
+};
+var _previousDeadCellsPerIteration = {
   _: 0
 };
 //Loop Cooditions
@@ -689,8 +772,8 @@ function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" 
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 _HtmlHandler.default.registerTabs();
 _HtmlHandler.default.registerControls();
-var table = _organism.default.initEvolution(10);
-_HtmlHandler.default.initHtmlTable(table, 10);
+var table = _organism.default.initEvolution(50);
+_HtmlHandler.default.initHtmlTable(table, 50);
 var Test = exports.default = /*#__PURE__*/function () {
   function Test() {
     _classCallCheck(this, Test);
@@ -699,11 +782,11 @@ var Test = exports.default = /*#__PURE__*/function () {
     key: "test",
     value: function () {
       var _test = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var repetitionCounter, sleep, _table, x, y, x1, y1;
+        var table, sleep;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              repetitionCounter = 0;
+              table = _organism.default.getTable();
               sleep = function sleep(delay) {
                 return new Promise(function (resolve) {
                   return setTimeout(resolve, delay);
@@ -711,39 +794,23 @@ var Test = exports.default = /*#__PURE__*/function () {
               };
             case 2:
               if (!(_organism.default.getIsAlive() && _organism.default.getHasStarted() && !_organism.default.getHasStopped() && !_organism.default.getIsStable() && !_organism.default.getIsRepeating())) {
-                _context.next = 25;
+                _context.next = 15;
                 break;
               }
-              _table = _organism.default.getTable();
-              x = _organism.default.getDeadCellPerIteration();
-              y = _organism.default.getLivingCellPerIteration();
-              _organism.default.validateStock(_table);
-              _organism.default.evolveGeneration(_table);
-              if (_organism.default.getLivingCellPerIteration() == 0) {
-                _organism.default.setIsRepeating(true);
-              }
-              _HtmlHandler.default.updateHtmlSpanInTable(_table);
-              _HtmlHandler.default.setHtmlStatValues();
-              _context.next = 13;
-              return sleep(_organism.default.getInterval());
-            case 13:
-              x1 = _organism.default.getDeadCellPerIteration();
-              y1 = _organism.default.getLivingCellPerIteration();
-              console.log("dead be " + x1);
-              console.log("dead : " + x);
-              console.log(y1);
-              console.log(y);
-              if (x == x1 && y == y1) {
-                ++repetitionCounter;
-              }
-              if (repetitionCounter > 3) {
-                _organism.default.setIsRepeating(true);
-              }
-              _organism.default.setIteration();
+              _organism.default.setPreviousIterationStatsCounter();
               _organism.default.resetIterationStatsCounter();
+              _organism.default.validateStock(table);
+              _organism.default.evolveGeneration(table);
+              _HtmlHandler.default.updateHtmlSpanInTable(table);
+              _HtmlHandler.default.setHtmlStatValues();
+              _context.next = 11;
+              return sleep(_organism.default.getInterval());
+            case 11:
+              _organism.default.detectRepetition();
+              _organism.default.setIteration();
               _context.next = 2;
               break;
-            case 25:
+            case 15:
             case "end":
               return _context.stop();
           }
@@ -781,7 +848,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58814" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64293" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];
