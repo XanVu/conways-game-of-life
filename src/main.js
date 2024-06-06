@@ -7,61 +7,31 @@ import Organism from './organism';
     HtmlHandler.registerControls()
 
 
-    let table = Organism.initEvolution(10)
-    HtmlHandler.initHtmlTable(table, 10)
-
-
+    let table = Organism.initEvolution(50)
+    HtmlHandler.initHtmlTable(table, 50)
   
 export default class Test {
 
     static async test(){
-
-        let repetitionCounter = 0
+        let table = Organism.getTable()
 
         const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
         while(Organism.getIsAlive() && Organism.getHasStarted() && !Organism.getHasStopped() && !Organism.getIsStable() && !Organism.getIsRepeating()){   
-          let table = Organism.getTable()
           
-          let x = Organism.getDeadCellPerIteration()
-          let y = Organism.getLivingCellPerIteration()
+          Organism.setPreviousIterationStatsCounter()
+          Organism.resetIterationStatsCounter();
           
           Organism.validateStock(table)
           Organism.evolveGeneration(table)
         
-          if(Organism.getLivingCellPerIteration() == 0){
-            Organism.setIsRepeating(true)
-          }
-          
           HtmlHandler.updateHtmlSpanInTable(table)
           HtmlHandler.setHtmlStatValues()
              
           await sleep(Organism.getInterval())
-    
-          let x1 = Organism.getDeadCellPerIteration()
-          let y1 = Organism.getLivingCellPerIteration()  
 
-
-          console.log("dead be " + x1)
-          console.log("dead : " + x)
-          console.log(y1)
-          console.log(y)
-
-
-
-          if(x == x1 && y == y1){
-            ++repetitionCounter
-          }
-
-    
-
-          if(repetitionCounter > 3){
-            Organism.setIsRepeating(true)
-          }
-        
+          Organism.detectRepetition()
           Organism.setIteration()
-          Organism.resetIterationStatsCounter();
-
         }  
     }
 }
