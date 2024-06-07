@@ -17,11 +17,8 @@ export default class Test {
 
         const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 
-        while(Organism.getIsAlive() && Organism.getHasStarted() && !Organism.getHasStopped() && !Organism.getIsStable() && !Organism.getIsRepeating()){   
-          
-          Organism.setPreviousIterationStatsCounter()
-          Organism.resetIterationStatsCounter();
-          
+        while(Organism.getHasStarted() && !Organism.getHasStopped() && Organism.getIsAlive() && !Organism.getIsStable() && !Organism.getIsRepeating()){   
+                      
           Organism.validateStock(table)
           Organism.evolveGeneration(table)
         
@@ -30,8 +27,12 @@ export default class Test {
              
           await sleep(Organism.getInterval())
 
+          Organism.runHealthCheck()
           Organism.detectRepetition()
-          Organism.setIteration()
+
+
+
+          HtmlHandler.setReasonOfDeath()  
         }  
     }
 }
