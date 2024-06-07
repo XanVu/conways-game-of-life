@@ -248,16 +248,23 @@ export default class Organism {
   
   static evolveGeneration(array){
     let acc = true
+    this.#saveCurrentStatsAndReset()
 
     for(var row = 0; row < array.length; row++){
       for(var col = 0; col < array.length; col++){
       const cell = this.#table[row][col]
       cell.evolve()
       this.#setIterationStatsCounter(cell)
-      acc =  this.#validateUnchangedState(acc, cell.getIsUnchanged())      
+      acc =  acc && cell.getIsUnchanged()     
       }
     }  
     this.#isStable = acc
+    this.setIteration()
+  }
+
+  static #saveCurrentStatsAndReset(){
+    this.setPreviousIterationStatsCounter()
+    this.resetIterationStatsCounter()
   }
 
   static #setIterationStatsCounter(cell){
@@ -270,10 +277,6 @@ export default class Organism {
 
     this.setPreviousLivingCellsPerIteration(currentLivingCells)
     this.setPreviousDeadCellsPerIteration(currentDeadCells)
-  }
-
-  static #validateUnchangedState(acc, isUnchanged){
-    return acc && isUnchanged
   }
 
 
@@ -298,12 +301,12 @@ export default class Organism {
  }
 
  static #validateRepetitionCondition(){
-  if(this.getRepetitionCounter() > this.getRepetitionThreshold()){  
+  if(this.getRepetitionCounter() == this.getRepetitionThreshold()){  
     this.setIsRepeating(true)
   }
  }
 
- static x(){
+ static runHealthCheck(){
   if(Organism.getLivingCellPerIteration() == 0){
     Organism.setIsAlive(false)
   }

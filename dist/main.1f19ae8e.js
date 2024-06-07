@@ -453,15 +453,17 @@ var Organism = exports.default = /*#__PURE__*/function () {
     key: "evolveGeneration",
     value: function evolveGeneration(array) {
       var acc = true;
+      _assertClassBrand(Organism, this, _saveCurrentStatsAndReset).call(this);
       for (var row = 0; row < array.length; row++) {
         for (var col = 0; col < array.length; col++) {
           var cell = _assertClassBrand(Organism, this, _table)._[row][col];
           cell.evolve();
           _assertClassBrand(Organism, this, _setIterationStatsCounter).call(this, cell);
-          acc = _assertClassBrand(Organism, this, _validateUnchangedState).call(this, acc, cell.getIsUnchanged());
+          acc = acc && cell.getIsUnchanged();
         }
       }
       _isStable._ = _assertClassBrand(Organism, this, acc);
+      this.setIteration();
     }
   }, {
     key: "setPreviousIterationStatsCounter",
@@ -490,8 +492,8 @@ var Organism = exports.default = /*#__PURE__*/function () {
       _assertClassBrand(Organism, this, _validateRepetitionCondition).call(this);
     }
   }, {
-    key: "x",
-    value: function x() {
+    key: "runHealthCheck",
+    value: function runHealthCheck() {
       if (Organism.getLivingCellPerIteration() == 0) {
         Organism.setIsAlive(false);
       }
@@ -557,15 +559,16 @@ function _updateStatsForCells(cell) {
   if (cell.getIsUnderpopulated()) _fatalitiesOfUnderpopulation._ = _assertClassBrand(_Organism, this, (_this$fatalitiesOfUnd = _assertClassBrand(_Organism, this, _fatalitiesOfUnderpopulation)._, ++_this$fatalitiesOfUnd));
   if (cell.getIsReproducing()) _reproducedCells._ = _assertClassBrand(_Organism, this, (_this$reproducedCells = _assertClassBrand(_Organism, this, _reproducedCells)._, ++_this$reproducedCells));
 }
+function _saveCurrentStatsAndReset() {
+  this.setPreviousIterationStatsCounter();
+  this.resetIterationStatsCounter();
+}
 function _setIterationStatsCounter(cell) {
   var _this$livingCellsPerI, _this$deadCellsPerIte;
   cell.getIsAlive() == true ? _livingCellsPerIteration._ = _assertClassBrand(_Organism, this, (_this$livingCellsPerI = _assertClassBrand(_Organism, this, _livingCellsPerIteration)._, ++_this$livingCellsPerI)) : _deadCellsPerIteration._ = _assertClassBrand(_Organism, this, (_this$deadCellsPerIte = _assertClassBrand(_Organism, this, _deadCellsPerIteration)._, ++_this$deadCellsPerIte));
 }
-function _validateUnchangedState(acc, isUnchanged) {
-  return acc && isUnchanged;
-}
 function _validateRepetitionCondition() {
-  if (this.getRepetitionCounter() > this.getRepetitionThreshold()) {
+  if (this.getRepetitionCounter() == this.getRepetitionThreshold()) {
     this.setIsRepeating(true);
   }
 }
@@ -728,6 +731,18 @@ var HtmlHandler = exports.default = /*#__PURE__*/function () {
       _assertClassBrand(HtmlHandler, this, _addingStats).call(this, currentDead, "Current Dead Cells: " + _organism.default.getDeadCellPerIteration());
       _assertClassBrand(HtmlHandler, this, _addingStats).call(this, iteration, "Cell Iteration: " + _organism.default.getIteration());
     }
+  }, {
+    key: "setReasonOfDeath",
+    value: function setReasonOfDeath() {
+      var causeOfDeath = document.getElementById("status");
+      var text = "Status: alive";
+      if (!_organism.default.getIsAlive()) text = "Status: died";
+      if (_organism.default.getIsStable()) text = "Status: reached stable configuration";
+      if (_organism.default.getIsRepeating()) {
+        text = "Status: reached stable repeating pattern after repeating " + _organism.default.getRepetitionCounter() + " times";
+      }
+      causeOfDeath.textContent = text;
+    }
   }]);
 }();
 function _addOnCLickEventListener(tab, element) {
@@ -793,24 +808,23 @@ var Test = exports.default = /*#__PURE__*/function () {
                 });
               };
             case 2:
-              if (!(_organism.default.getIsAlive() && _organism.default.getHasStarted() && !_organism.default.getHasStopped() && !_organism.default.getIsStable() && !_organism.default.getIsRepeating())) {
-                _context.next = 15;
+              if (!(_organism.default.getHasStarted() && !_organism.default.getHasStopped() && _organism.default.getIsAlive() && !_organism.default.getIsStable() && !_organism.default.getIsRepeating())) {
+                _context.next = 14;
                 break;
               }
-              _organism.default.setPreviousIterationStatsCounter();
-              _organism.default.resetIterationStatsCounter();
               _organism.default.validateStock(table);
               _organism.default.evolveGeneration(table);
               _HtmlHandler.default.updateHtmlSpanInTable(table);
               _HtmlHandler.default.setHtmlStatValues();
-              _context.next = 11;
+              _context.next = 9;
               return sleep(_organism.default.getInterval());
-            case 11:
+            case 9:
+              _organism.default.runHealthCheck();
               _organism.default.detectRepetition();
-              _organism.default.setIteration();
+              _HtmlHandler.default.setReasonOfDeath();
               _context.next = 2;
               break;
-            case 15:
+            case 14:
             case "end":
               return _context.stop();
           }
@@ -848,7 +862,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51740" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55796" + '/');
   ws.onmessage = function (event) {
     checkedAssets = {};
     assetsToAccept = [];

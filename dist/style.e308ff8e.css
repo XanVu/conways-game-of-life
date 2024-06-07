@@ -2,9 +2,11 @@
 
 table {
   border: 3px solid black;
-  border-radius: 10px;
-  padding: auto;
+  border-radius: 0px;
+  padding: 15px;
   margin-top: 25px;
+  margin-bottom: 50px;
+  background-color: white;
 }
 
 p {
@@ -12,15 +14,15 @@ p {
   padding-right: 25%;
 } 
 
-
 h1 {
-  font-size: 2em;
+  font-size: 3em;
   margin: 0.67em 0;
+  margin-top: 50px;
   text-align: center;
 }
 
 .greenCircle{
-  background-color:rgb(12, 238, 12);
+  background-color:#6d031c;
   display:block;
   height:10px;
   width:10px;
@@ -31,7 +33,7 @@ h1 {
 }
 
 .blackCircle{
-  background-color:black;
+  background-color:#d2d2c9;
   display:block;
   height:10px;
   width:10px;
@@ -39,14 +41,18 @@ h1 {
   margin:auto;
   color:#fff;
   text-align:center
-  
 }
+
+.buttonHeight{
+  height: 65px;
+}
+
 
 /* Style the tab */
 .tab {
   overflow: hidden;
-  border: 1px solid #ccc;
-  background-color: #f1f1f1;
+  background-color: #1b1210;
+  color: white
 }
 
 /* Style the buttons that are used to open the tab content */
@@ -62,7 +68,7 @@ h1 {
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-  background-color: #ddd;
+  background-color: #a79086;
 }
 
 /* Create an active/current tablink class */
@@ -80,11 +86,10 @@ h1 {
 }
 
 
-
-
 /* Opinionated CSS defaults based on:
   ! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css 
 */
+
 
 html {
   line-height: 1.2; 
@@ -97,6 +102,7 @@ html, * {
 
 body {
   margin: 0;
+  background-color: rgb(255, 247, 233);
 }
 
 

@@ -112,4 +112,22 @@ export default class HtmlHandler {
     static #addingStats(element, text){
         element.textContent = text
     }
+
+    static setReasonOfDeath(){
+      let causeOfDeath = document.getElementById("status")
+
+      let text = "Status: alive"
+
+      if(!Organism.getIsAlive())
+        text = "Status: died"
+      
+      if(Organism.getIsStable())
+        text = "Status: reached stable configuration"
+
+      if(Organism.getIsRepeating()){
+        text = "Status: reached stable repeating pattern after repeating " + Organism.getRepetitionCounter() + " times"
+      }
+
+      causeOfDeath.textContent = text
+    }
 }
