@@ -38,7 +38,7 @@ export default class HtmlHandler {
 
         startButton.addEventListener("click", function(){
             Organism.setHasStarted(true)
-            Test.test()
+            Test.recursiveLoop()
             Organism.setStopped(false)
         }, false)
     
@@ -56,10 +56,11 @@ export default class HtmlHandler {
         let array = Organism.getTable()
         let table = document.querySelector("table");
     
+
         for(var row = 0; row < array.length; row++){
+          let x = array[row]
             let r = table.insertRow()
-         
-            for(var col = 0; col < array.length; col++){
+            for(var col = 0; col < x.length; col++){
                 let cell = array[row][col]
                 let c = r.insertCell()
                 let span = document.createElement("span")             
@@ -73,7 +74,8 @@ export default class HtmlHandler {
     
       static updateHtmlSpanInTable(array){
         for(var row = 0; row < array.length; row++){
-          for(var col = 0; col < array.length; col++){
+          let x = array[row]
+          for(var col = 0; col < x.length; col++){
             let cell = array[row][col]
     
             let table = document.querySelector("table")
