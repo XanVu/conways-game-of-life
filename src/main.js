@@ -12,7 +12,7 @@ import Organism from './organism';
   
 export default class Test {
 
-    static test(){
+    static recursiveLoop(){
         let table = Organism.getTable()
 
           Organism.validateStock(table)
@@ -23,11 +23,12 @@ export default class Test {
           HtmlHandler.updateHtmlSpanInTable(table)
           HtmlHandler.setHtmlStatValues()
 
-          setTimeout( () => {
 
-            if(Organism.getHasStarted() && !Organism.getHasStopped() && Organism.getIsAlive() && !Organism.getIsStable() && !Organism.getIsRepeating())
-                Test.test()
-            }, Organism.getInterval())
+            
+          if(Organism.getHasStarted() && !Organism.getHasStopped() && Organism.getIsAlive() && !Organism.getIsStable() && !Organism.getIsRepeating())
+            setTimeout(Test.recursiveLoop, Organism.getInterval())
+          
+            
     }
 }
 

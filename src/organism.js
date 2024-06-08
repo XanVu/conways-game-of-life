@@ -1,11 +1,12 @@
 import Cell from "./cell.js";
 
 export default class Organism {
-    static #table
-    //controls
-    static #size = 0
-    static #interval = 500
+    static #table 
     static #repetitionCounter = 0
+    //controls
+    static #rowDepth = 45
+    static #columDepth = 40
+    static #interval = 0
     static #repetitionThreshold = 5
 
     //Stats
@@ -47,8 +48,12 @@ export default class Organism {
       return this.#table
     }
 
-    static getSize(){
-      return this.#size
+    static getRowDepth(){
+      return this.#rowDepth
+    }
+
+    static getColumnDepth(){
+      return this.#columDepth
     }
 
     static getInterval(){
@@ -103,17 +108,17 @@ export default class Organism {
       return this.#isRepeating
     }
 
-    static setSize(size){
-       this.#size = size 
+    static setRowDepth(size){
+       this.#rowDepth = size 
     }
+
+    static setColumnDepth(size){
+      this.#columDepth = size 
+   }
 
     static setTable(table){
       this.#table = table 
     } 
-
-    static getInterval(interval){
-      this.#interval = interval
-    }
 
     static getHasStarted(){
       return this.#hasStarted
@@ -165,14 +170,16 @@ export default class Organism {
     }
 
     static initTable(){
-      let size = this.getSize()
-      let table =  Array.from(new Array(size), () => new Array(size))
+      let rowDepth = this.getRowDepth()
+      let columnDepth = this.getColumnDepth()
+      let table =  Array.from(new Array(rowDepth), () => new Array(columnDepth))
       this.setTable(table)
     }
 
     static startingLive(array){
       for(var row = 0; row < array.length; row++){
-        for(var col = 0; col < array.length; col++){
+        let x = array[row]
+        for(var col = 0; col < x.length; col++){
           let cell = this.#CreateCell()
           array[row][col] = cell
           this.#setIterationStatsCounter(cell)
@@ -187,7 +194,8 @@ export default class Organism {
 
     static validateStock(array){
       for(var row = 0; row < array.length; row++){
-        for(var col = 0; col < array.length; col++){
+        let x = array[row]
+        for(var col = 0; col < x.length; col++){
             let cell = array[row][col]
             let livingAdjacentCells = this.#livingAdjacentCells(row, col)
             cell.determineDevelopment(livingAdjacentCells)
@@ -203,9 +211,10 @@ export default class Organism {
   }
 
   static #getAdjacentCellCoordinates(row, col){
-    let size = this.getSize()
-    let columns = Array((col - 1), col, ( col + 1)).map(index => this.#calculateValidIndex(index, size))
-    let rows = Array((row - 1), row, (row + 1)).map(index => this.#calculateValidIndex(index, size)) 
+    let rowDepth = this.getRowDepth()
+    let columnDepth = this.getColumnDepth()
+    let columns = Array((col - 1), col, ( col + 1)).map(index => this.#calculateValidIndex(index, columnDepth))
+    let rows = Array((row - 1), row, (row + 1)).map(index => this.#calculateValidIndex(index, rowDepth)) 
     let cartesianProduct = rows.flatMap(row => columns.map(column => Array(row, column)))
     let adjacentCells = cartesianProduct.filter(coordinateArray => !this.#isIdentity(row, col, coordinateArray))
     return adjacentCells
@@ -251,7 +260,8 @@ export default class Organism {
     this.#saveCurrentStatsAndReset()
 
     for(var row = 0; row < array.length; row++){
-      for(var col = 0; col < array.length; col++){
+      let x = array[row]
+      for(var col = 0; col < x.length; col++){
       const cell = this.#table[row][col]
       cell.evolve()
       this.#setIterationStatsCounter(cell)
@@ -279,11 +289,8 @@ export default class Organism {
     this.setPreviousDeadCellsPerIteration(currentDeadCells)
   }
 
-
-  static initEvolution(size){
-      this.setSize(size)
+  static initEvolution(){
       this.initTable()
-
       let table = this.getTable()
       return this.startingLive(table)
   }
@@ -311,5 +318,4 @@ export default class Organism {
     Organism.setIsAlive(false)
   }
  }
-
 }
