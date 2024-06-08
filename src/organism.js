@@ -4,7 +4,7 @@ export default class Organism {
     static #table
     //controls
     static #size = 0
-    static #interval = 100
+    static #interval = 500
     static #repetitionCounter = 0
     static #repetitionThreshold = 5
 
@@ -123,8 +123,8 @@ export default class Organism {
       this.#hasStarted = true
     }
 
-    static setStopped(){
-      this.#hasStopped = true
+    static setStopped(bool){
+      this.#hasStopped = bool
     }
 
     static setInterval(interval){
