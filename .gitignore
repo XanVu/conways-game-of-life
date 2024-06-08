@@ -1,7 +1,12 @@
 
 .cache
-.vscode
-dist
+/dist
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # Logs
 logs

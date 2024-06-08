@@ -3,59 +3,61 @@
 <head>
   <title>A JavaScript project</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-
- 
-
   <!-- Tab links -->
-<div class="tab">
-  <button id="StatsTab" class="buttonHeight">STATS</button>
-  <button id="RulesTab" class="buttonHeight">BASIC RULES</button>
-  <button id="DefinitionTab" class="buttonHeight">DEFINITION</button>
-  
-  <button id="Start" class="buttonHeight">START</button>
-  <button id="Stop" class="buttonHeight">STOP</button>
-  <button id="Reset" class="buttonHeight">RESET</button>
-</div>
 
-<h1>CONWAY'S GAME OF LIFE</h1>
-
-<!-- Tab content -->
-<div id="Stats" class="tabcontent" style="display: block;">
-  <h3>Stats</h3>
-  <div>
-    <p id="iteration"></p> 
-    <p id="currentLivingCells"></p>
-    <p id="currentDeadCells"></p>
-    <p id="underpopulation"></p>
-    <p id="overpopulation"></p>
-    <p id="reproduction"></p>
-    <p id="status"></p>
-    </div> 
-
+<div id="flexContainer"> 
+    <div id ="tabContainer" class="nav">
+      <button id="StatsTab" class="tab-button">STATS</button>
+      <button id="RulesTab" class="tab-button">BASIC RULES</button>
+      <button id="DefinitionTab" class="tab-button">DEFINITION</button>
+    </div>
     
+    <div id="headline">
+      <h1>CONWAY'S GAME OF LIFE</h1>
+    </div>
 
+    <div id="mainContainer">
+  
+    <!-- Tab content -->
+    <div id="tabContentContainer">
+      <div id="Stats" class="tabcontent">
+        <h3>STATS</h3>
+        <p id="iteration"></p> 
+        <p id="currentLivingCells"></p>
+        <p id="currentDeadCells"></p>
+        <p id="underpopulation"></p>
+        <p id="overpopulation"></p>
+        <p id="reproduction"></p>
+        <p id="status"></p>  
+    </div>
 
-</div>
+    <div id="Rules" class="tabcontent invisible">
+      <h3>BASIC RULES</h3>
+        <p>1. Any live cell with fewer than two live neighbors dies, as if by underpopulation.</p>
+        <p>2. Any live cell with two or three live neighbors lives on to the next generation.</p>
+        <p>3. Any live cell with more than three live neighbors dies, as if by overpopulation.</p>
+        <p>4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.</p>
+    </div>
 
-<div id="Rules" class="tabcontent" style="display: none;">
-  <h3>Basic Rules of the Conway's game of life</h3>
-  <p>1. Any live cell with fewer than two live neighbors dies, as if by underpopulation.</p>
-   <p>2. Any live cell with two or three live neighbors lives on to the next generation.</p>
-   <p>3. Any live cell with more than three live neighbors dies, as if by overpopulation.</p>
-   <p>4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.</p>
-</div>
-
-<div id="Definition" class="tabcontent" style="display: none;">
-  <h3>Definition</h3>
-  <p>The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. It is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and observing how it evolves. It is Turing complete and can simulate a universal constructor or any other Turing machine.</p>
-</div>
-
-<div style="display: flex; justify-content: center; align-items: center;">
-  <table>
-  </table>
+    <div id="Definition" class="tabcontent invisible">
+      <h3>DEFINITION</h3>
+        <p>The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. It is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and observing how it evolves. It is Turing complete and can simulate a universal constructor or any other Turing machine.</p>
+    </div>
+  </div>
+    <div id="tableContainer">
+      <div id="controlContainer"> 
+         <button id="Start" class="controls"> <i class="fa fa-play-circle-o fa-3x"></i></button>
+         <button id="Reset" class="controls"> <i class="fa fa-refresh fa-3x"></i></button> 
+         <button id="Stop" class="controls"> <i class="fa fa-pause-circle-o fa-3x"></i></button>
+      </div>
+  
+      <table></table>
+    </div>
+  </div>
 </div>
 
 </body>
