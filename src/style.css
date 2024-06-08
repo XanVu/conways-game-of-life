@@ -114,7 +114,7 @@ h3{
 /* Style the tab */
 .nav {
   background-color: #673e37;
-  border-bottom: 1px solid #000000;
+  border-bottom: 2px solid #000000;
 }
 
 /* Style the buttons that are used to open the tab content */
@@ -125,6 +125,7 @@ h3{
   cursor: pointer;
   padding: 14px 16px;
   transition: 0.3s;
+  margin: auto;
 }
 
 /* Change background color of buttons on hover */
@@ -140,7 +141,7 @@ h3{
 /* Style the tab content */
 .tabcontent {
   padding: 6px 12px;
-  border: 1px solid #000000;
+  border: 2px solid #000000;
   text-align: left;
 }
 
@@ -220,10 +221,6 @@ button, select {
 button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner {
   border-style: none;
   padding: 0;
-}
-
-button:-moz-focusring, [type="button"]:-moz-focusring, [type="reset"]:-moz-focusring, [type="submit"]:-moz-focusring {
-  outline: 1px dotted ButtonText;
 }
 
 fieldset {

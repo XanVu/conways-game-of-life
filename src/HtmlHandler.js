@@ -39,6 +39,7 @@ export default class HtmlHandler {
         startButton.addEventListener("click", function(){
             Organism.setHasStarted(true)
             Test.test()
+            Organism.setStopped(false)
         }, false)
     
         stopButton.addEventListener("click", function(){

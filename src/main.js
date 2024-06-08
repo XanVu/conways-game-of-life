@@ -12,24 +12,22 @@ import Organism from './organism';
   
 export default class Test {
 
-    static async test(){
+    static test(){
         let table = Organism.getTable()
 
-        const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-
-        while(Organism.getHasStarted() && !Organism.getHasStopped() && Organism.getIsAlive() && !Organism.getIsStable() && !Organism.getIsRepeating()){   
-                      
           Organism.validateStock(table)
           Organism.evolveGeneration(table)
-        
-          await sleep(Organism.getInterval())
-
           Organism.runHealthCheck()
           Organism.detectRepetition()
           
           HtmlHandler.updateHtmlSpanInTable(table)
           HtmlHandler.setHtmlStatValues()
-        }  
+
+          setTimeout( () => {
+
+            if(Organism.getHasStarted() && !Organism.getHasStopped() && Organism.getIsAlive() && !Organism.getIsStable() && !Organism.getIsRepeating())
+                Test.test()
+            }, Organism.getInterval())
     }
 }
 
