@@ -7,8 +7,8 @@ import Organism from './organism';
     HtmlHandler.registerControls()
 
 
-    let table = Organism.initEvolution(50)
-    HtmlHandler.initHtmlTable(table, 50)
+    Organism.initEvolution(40)
+    HtmlHandler.initHtmlTable()
   
 export default class Test {
 
@@ -22,17 +22,13 @@ export default class Test {
           Organism.validateStock(table)
           Organism.evolveGeneration(table)
         
-          HtmlHandler.updateHtmlSpanInTable(table)
-          HtmlHandler.setHtmlStatValues()
-             
           await sleep(Organism.getInterval())
 
           Organism.runHealthCheck()
           Organism.detectRepetition()
-
-
-
-          HtmlHandler.setReasonOfDeath()  
+          
+          HtmlHandler.updateHtmlSpanInTable(table)
+          HtmlHandler.setHtmlStatValues()
         }  
     }
 }

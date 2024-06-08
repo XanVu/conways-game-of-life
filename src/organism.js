@@ -182,7 +182,7 @@ export default class Organism {
     }
 
     static #CreateCell(){
-      return (Math.random() > 0.5) ? new Cell(true) : new Cell(false)
+      return (Math.random() > 0.75) ? new Cell(true) : new Cell(false)
      }
 
     static validateStock(array){

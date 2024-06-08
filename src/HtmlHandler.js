@@ -2,30 +2,32 @@ import Test from "./main";
 import Organism from "./organism";
 
 export default class HtmlHandler {
+  static #formatter = new Intl.NumberFormat('de-De', {maximumSignificantDigits: 6}) 
 
   static registerTabs(){
-        let StatsTab = document.getElementById("StatsTab")
-        let RulesTab = document.getElementById("RulesTab")
-        let DefinitionTab = document.getElementById("DefinitionTab")
+        let tabContainer = document.getElementById("tabContainer")
 
-        let stats = document.getElementById("Stats")
-        let rules = document.getElementById("Rules")
-        let definition = document.getElementById("Definition")    
-       
-        this.#addOnCLickEventListener(StatsTab, stats)
-        this.#addOnCLickEventListener(RulesTab, rules)
-        this.#addOnCLickEventListener(DefinitionTab, definition)
+        let buttonTabs = tabContainer.children
 
-    }
+        let tabContentContainer = document.getElementById("tabContentContainer")
 
-    static #addOnCLickEventListener(tab, element){
-        tab.addEventListener("click", function(){
-            if(element.style.display === "none"){
-                element.style.display = "block" 
-            }
-            else
-            element.style.display = "none"
-        })
+        let contentTabs = tabContentContainer.children
+
+        for(var i = 0; i < contentTabs.length; ++i){
+        let tab = contentTabs[i]    
+        buttonTabs[i].addEventListener("click", function(){
+          
+            if(!tab.classList.contains('invisible'))
+               tab.classList.add('invisible')
+            else {
+            let otherTabs = Array.prototype.filter.call(contentTabs, function(t) {
+              return t != tab 
+            })
+            otherTabs.map(x => x.classList.add('invisible'))    
+            tab.classList.remove('invisible')    
+            }         
+          })
+        }
     }
     
    static registerControls(){
@@ -49,13 +51,14 @@ export default class HtmlHandler {
     
     }
 
-    static initHtmlTable(array, size) {
+    static initHtmlTable() {
+        let array = Organism.getTable()
         let table = document.querySelector("table");
     
-        for(var row = 0; row < size; row++){
+        for(var row = 0; row < array.length; row++){
             let r = table.insertRow()
          
-            for(var col = 0; col < size; col++){
+            for(var col = 0; col < array.length; col++){
                 let cell = array[row][col]
                 let c = r.insertCell()
                 let span = document.createElement("span")             
@@ -84,11 +87,11 @@ export default class HtmlHandler {
       static #setColorOfSpan(span, cell){
         if(cell.getIsAlive()){ 
             span.classList.remove(...span.classList)
-            span.classList.add("greenCircle")
+            span.classList.add("livingCircle")
           }
           else{
             span.classList.remove(...span.classList)
-            span.classList.add("blackCircle")
+            span.classList.add("deadCircle")
           }
     }
     
@@ -100,34 +103,39 @@ export default class HtmlHandler {
         let currentLiving = document.getElementById("currentLivingCells")
         let currentDead = document.getElementById("currentDeadCells")
         let iteration = document.getElementById("iteration")
+        let status = document.getElementById("status")
+        
+        
+        
+        this.#addingStats(status, this.#determineStatus())
+        this.#addingStats(iteration, this.#formatter.format(Organism.getIteration()) + " generation")
+        this.#addingStats(underpopulation, this.#formatter.format(Organism.getFatalitiesOfUnderpopulation()) + " cells died by virtue of underpolulation!") 
+        this.#addingStats(overpopulation, this.#formatter.format(Organism.getFatalitiesOfOverpopulation()) + " cells died by virtue of overpolulation!") 
+        this.#addingStats(repoduction, this.#formatter.format(Organism.getReproducedCells()) + " cells came alive by virtue of reproduction!")
+        this.#addingStats(currentLiving, this.#formatter.format(Organism.getLivingCellPerIteration()) + " cells are currently alive!") 
+        this.#addingStats(currentDead, this.#formatter.format(Organism.getDeadCellPerIteration()) + " cells are currently dead!")   
+        
+        
 
-        this.#addingStats(underpopulation, "Cell died of Underpopulation: " + Organism.getFatalitiesOfUnderpopulation()) 
-        this.#addingStats(overpopulation, "Cell died of Overpopulation: " + Organism.getFatalitiesOfOverpopulation()) 
-        this.#addingStats(repoduction, "Cells reproduced: " +  Organism.getReproducedCells())
-        this.#addingStats(currentLiving, "Current Living Cells: " + Organism.getLivingCellPerIteration()) 
-        this.#addingStats(currentDead, "Current Dead Cells: " + Organism.getDeadCellPerIteration())   
-        this.#addingStats(iteration, "Cell Iteration: " + Organism.getIteration())
+
     }
 
     static #addingStats(element, text){
         element.textContent = text
     }
 
-    static setReasonOfDeath(){
-      let causeOfDeath = document.getElementById("status")
-
-      let text = "Status: alive"
+    static #determineStatus(){
+      let text = "Status: Organism is alive!"
 
       if(!Organism.getIsAlive())
-        text = "Status: died"
+        text = "Status: Organism is dead!"
       
       if(Organism.getIsStable())
-        text = "Status: reached stable configuration"
+        text = "Status: stable configuration!"
 
       if(Organism.getIsRepeating()){
-        text = "Status: reached stable repeating pattern after repeating " + Organism.getRepetitionCounter() + " times"
+        text = "Status: stable repeating pattern!"
       }
-
-      causeOfDeath.textContent = text
+      return text
     }
 }
