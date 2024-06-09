@@ -3,8 +3,8 @@ import Cell from "./Cell.js";
 import LoopConditionHandler from "./LoopConditionHandler.js";
 
 export default class SphereOfLife {
-    static #rowDepth = 15
-    static #columDepth = 15
+    static #rowDepth = 45
+    static #columDepth = 45
     static #table   
     static #interval = 0 
 

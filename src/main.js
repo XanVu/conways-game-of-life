@@ -6,7 +6,7 @@ import SphereOfLife from './organism';
 
     HtmlHandler.registerTabs()
     HtmlHandler.registerControls()
-    
+
     SphereOfLife.initEvolution(40)
     HtmlHandler.initHtmlTable()
   
