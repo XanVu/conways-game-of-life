@@ -1,5 +1,7 @@
 import Test from "./main";
-import Organism from "./organism";
+import StatisticHandler from "./StatisticHandler.js";
+import SphereOfLife from "./organism";
+import LoopConditionHandler from "./LoopConditionHandler.js";
 
 export default class HtmlHandler {
   static #formatter = new Intl.NumberFormat('de-De', {maximumSignificantDigits: 6}) 
@@ -37,13 +39,13 @@ export default class HtmlHandler {
     
 
         startButton.addEventListener("click", function(){
-            Organism.setHasStarted(true)
+            LoopConditionHandler.setHasStarted(true)
             Test.recursiveLoop()
-            Organism.setStopped(false)
+            LoopConditionHandler.setStopped(false)
         }, false)
     
         stopButton.addEventListener("click", function(){
-            Organism.setStopped(true) 
+          LoopConditionHandler.setStopped(true) 
         }, false)
 
         resetButton.addEventListener("click", function(){
@@ -53,10 +55,9 @@ export default class HtmlHandler {
     }
 
     static initHtmlTable() {
-        let array = Organism.getTable()
+        let array = SphereOfLife.getTable()
         let table = document.querySelector("table");
     
-
         for(var row = 0; row < array.length; row++){
           let x = array[row]
             let r = table.insertRow()
@@ -111,12 +112,12 @@ export default class HtmlHandler {
         
         
         this.#addingStats(status, this.#determineStatus())
-        this.#addingStats(iteration, this.#formatter.format(Organism.getIteration()) + " generation")
-        this.#addingStats(underpopulation, this.#formatter.format(Organism.getFatalitiesOfUnderpopulation()) + " cells died by virtue of underpolulation!") 
-        this.#addingStats(overpopulation, this.#formatter.format(Organism.getFatalitiesOfOverpopulation()) + " cells died by virtue of overpolulation!") 
-        this.#addingStats(repoduction, this.#formatter.format(Organism.getReproducedCells()) + " cells came alive by virtue of reproduction!")
-        this.#addingStats(currentLiving, this.#formatter.format(Organism.getLivingCellPerIteration()) + " cells are currently alive!") 
-        this.#addingStats(currentDead, this.#formatter.format(Organism.getDeadCellPerIteration()) + " cells are currently dead!")   
+        this.#addingStats(iteration, this.#formatter.format(StatisticHandler.getIteration()) + " generation")
+        this.#addingStats(underpopulation, this.#formatter.format(StatisticHandler.getFatalitiesOfUnderpopulation()) + " cells died by virtue of underpolulation!") 
+        this.#addingStats(overpopulation, this.#formatter.format(StatisticHandler.getFatalitiesOfOverpopulation()) + " cells died by virtue of overpolulation!") 
+        this.#addingStats(repoduction, this.#formatter.format(StatisticHandler.getReproducedCells()) + " cells came alive by virtue of reproduction!")
+        this.#addingStats(currentLiving, this.#formatter.format(StatisticHandler.getLivingCellPerIteration()) + " cells are currently alive!") 
+        this.#addingStats(currentDead, this.#formatter.format(StatisticHandler.getDeadCellPerIteration()) + " cells are currently dead!")   
         
         
 
@@ -130,13 +131,13 @@ export default class HtmlHandler {
     static #determineStatus(){
       let text = "Status: Organism is alive!"
 
-      if(!Organism.getIsAlive())
+      if(!LoopConditionHandler.getIsAlive())
         text = "Status: Organism is dead!"
       
-      if(Organism.getIsStable())
+      if(!LoopConditionHandler.getIsEvolving())
         text = "Status: stable configuration!"
 
-      if(Organism.getIsRepeating()){
+      if(LoopConditionHandler.getIsRepeating()){
         text = "Status: stable repeating pattern!"
       }
       return text

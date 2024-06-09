@@ -5,7 +5,7 @@ export default class Cell {
     #isUnderpopulated = false
     #isOverpopulated = false
     #isReproducing = false
-    #isUnchanged = false
+    #hasChanged = false
  
     
     constructor(isAlive){
@@ -32,8 +32,8 @@ export default class Cell {
       return this.#isReproducing
     }
 
-    getIsUnchanged(){
-      return this.#isUnchanged
+    getHasChanged(){
+      return this.#hasChanged
     }
 
     #setIsAlive(bool){
@@ -56,8 +56,8 @@ export default class Cell {
       this.#isReproducing = bool
     }
 
-    #setIsUnchanged(bool){
-      this.#isUnchanged = bool
+    #setHasChanged(bool){
+      this.#hasChanged = bool
     }
 
 
@@ -86,14 +86,13 @@ export default class Cell {
       this.#setNextState(isSurviving)
     }
 
-
     determineDevelopment(adjacentLivingCells){
       this.getIsAlive() ? this.#isSurviving(adjacentLivingCells) : this.#reproducing(adjacentLivingCells)
     }
 
     evolve(){
-      let isUnchanged = this.getIsAlive() == this.getNextState()
-      this.#setIsUnchanged(isUnchanged)
+      let hasChanged = this.getIsAlive() != this.getNextState()
+      this.#setHasChanged(hasChanged)
       this.#setIsAlive(this.getNextState())
     }
   }
