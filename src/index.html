@@ -53,9 +53,13 @@
          <button id="Start" class="controls"> <i class="fa fa-play-circle-o fa-3x"></i></button>
          <button id="Stop" class="controls"> <i class="fa fa-pause-circle-o fa-3x"></i></button>
          <button id="Reset" class="controls"> <i class="fa fa-refresh fa-3x"></i></button> 
-         <button id="Settings" class="controls"> <i class="fa fa-cog fa-3x" aria-hidden="true"></i></button> 
+         <button id="Setting" class="controls"> <i class="fa fa-cog fa-3x" aria-hidden="true"></i></button> 
       </div>
   
+      <div id="settingsContainer" class=" invisible"> 
+        <input id="interval" type="range" min="0" max="2000" value="0" step="100" class="slider">
+        <h5>PAUSE INTERVAL</h5>   
+      </div>
       <table></table>
     </div>
   </div>

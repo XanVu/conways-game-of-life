@@ -2,7 +2,32 @@ import Test from "./main";
 import live from "./Live.js";
 
 export default class HtmlHandler {
+  static threshold = 0
+  static interval = 0
+  static rows = 0
+  static columns = 0
+  static distribition = 0.0
+
   static #formatter = new Intl.NumberFormat('de-De', {maximumSignificantDigits: 6}) 
+
+  static registerSlider(){
+  
+    let intervalSilder = document.getElementById("interval")
+
+    intervalSilder.addEventListener("input", function(){
+        this.interval = intervalSilder.value
+        live.setInterval(this.interval)
+    })
+
+  }
+
+  static hideButtons(){
+   
+      let startButton = document.getElementById("Start")
+      let stopButton = document.getElementById("Stop") 
+      startButton.classList.add('invisible')
+      stopButton.classList.add('invisible')
+  }
 
   static registerTabs(){
         let tabContainer = document.getElementById("tabContainer")
@@ -34,6 +59,8 @@ export default class HtmlHandler {
         let startButton = document.getElementById("Start")
         let stopButton = document.getElementById("Stop") 
         let resetButton = document.getElementById("Reset")
+        let settingButton = document.getElementById("Setting")
+        let settingContainer = document.getElementById("settingsContainer")
     
 
         startButton.addEventListener("click", function(){
@@ -49,9 +76,22 @@ export default class HtmlHandler {
         }, false)
 
         resetButton.addEventListener("click", function(){
-            location.reload()
+          location.reload()
+
+          let startButton = document.getElementById("Start")
+          let stopButton = document.getElementById("Stop") 
+
+          startButton.classList.remove('invisible')
+          stopButton.classList.remove('invisible')
         })
     
+        settingButton.addEventListener("click", function(){
+          if(settingContainer.classList.contains('invisible'))
+            settingContainer.classList.remove('invisible')
+          else
+          settingContainer.classList.add('invisible')
+      })
+
     }
 
     static initHtmlTable() {
@@ -118,10 +158,7 @@ export default class HtmlHandler {
         this.#addingStats(repoduction, this.#formatter.format(live.lifeStatistics.getReproducedCells()) + " cells came alive by virtue of reproduction!")
         this.#addingStats(currentLiving, this.#formatter.format(live.lifeStatistics.getLivingCellPerIteration()) + " cells are currently alive!") 
         this.#addingStats(currentDead, this.#formatter.format(live.lifeStatistics.getDeadCellPerIteration()) + " cells are currently dead!")   
-        
-        
-
-
+      
     }
 
     static #addingStats(element, text){
@@ -131,13 +168,19 @@ export default class HtmlHandler {
     static #determineStatus(){
       let text = "Status: Organism is alive!"
 
-      if(!live.conditionValidator.getIsAlive())
+      if(!live.conditionValidator.getIsAlive()){
+        this.hideButtons()
         text = "Status: Organism is dead!"
+      }
+       
       
-      if(!live.conditionValidator.getIsEvolving())
+      if(!live.conditionValidator.getIsEvolving()){
+        this.hideButtons()
         text = "Status: stable configuration!"
-
+      }
+       
       if(live.conditionValidator.getIsRepeating()){
+        this.hideButtons()
         text = "Status: stable repeating pattern!"
       }
       return text
