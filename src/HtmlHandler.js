@@ -57,19 +57,19 @@ export default class HtmlHandler {
     static initHtmlTable() {
         let array = live.getTable()
         let table = document.querySelector("table");
-    
-        for(var row = 0; row < array.length; row++){
-          let x = array[row]
-            let r = table.insertRow()
-            for(var col = 0; col < x.length; col++){
-                let cell = array[row][col]
-                let c = r.insertCell()
-                let span = document.createElement("span")             
-                c.appendChild(span)
-                this.#setColorOfSpan(span, cell)
-           }
-        }
-    
+        array?.map( subArray => {
+          let r = table.insertRow()
+          
+          subArray?.map(cell => {
+           
+            let c = r.insertCell()
+            let span = document.createElement("span")             
+            c.appendChild(span)
+            this.#setColorOfSpan(span, cell)
+
+          })
+        })
+      
         this.setHtmlStatValues()
     }
     
