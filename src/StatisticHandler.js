@@ -1,93 +1,103 @@
+
+let instance
+
 export default class StatisticHandler {
-    static #iteration = 0
-    static #livingCellsPerIteration = 0
-    static #deadCellsPerIteration = 0
-    static #fatalitiesOfOverpopulation = 0
-    static #fatalitiesOfUnderpopulation = 0
-    static #reproducedCells = 0
+    #iteration = 0
+    #livingCellsPerIteration = 0
+    #deadCellsPerIteration = 0
+    #fatalitiesOfOverpopulation = 0
+    #fatalitiesOfUnderpopulation = 0
+    #reproducedCells = 0
 
-    static #previousLivingCellsPerIteration = 0
-    static #previousDeadCellsPerIteration = 0
+    #previousLivingCellsPerIteration = 0
+    #previousDeadCellsPerIteration = 0
 
-    static getIteration(){
+    constructor(){
+      if (instance)
+        throw new Error("Singleton")
+      
+      instance = this;
+    }
+
+    getIteration(){
         return this.#iteration
       }
   
-      static getLivingCellPerIteration(){
-        return this.#livingCellsPerIteration
-      }
+    getLivingCellPerIteration(){
+      return this.#livingCellsPerIteration
+    }
   
-      static getDeadCellPerIteration(){
-        return this.#deadCellsPerIteration
-      }
+    getDeadCellPerIteration(){
+      return this.#deadCellsPerIteration
+    }
   
-      static getFatalitiesOfOverpopulation(){
+      getFatalitiesOfOverpopulation(){
         return this.#fatalitiesOfOverpopulation
       }
   
-      static getFatalitiesOfUnderpopulation(){
+      getFatalitiesOfUnderpopulation(){
         return this.#fatalitiesOfUnderpopulation
       }
   
-      static getReproducedCells(){
+      getReproducedCells(){
         return this.#reproducedCells
       }
 
-      static getPreviousLivingCellsPerIteration(){
+      getPreviousLivingCellsPerIteration(){
         return this.#previousLivingCellsPerIteration
       }
   
-      static getPreviousDeadCellsPerIteration(){
+      getPreviousDeadCellsPerIteration(){
         return this.#previousDeadCellsPerIteration
       }
 
 
-      static setPreviousLivingCellsPerIteration(pervious){
+      setPreviousLivingCellsPerIteration(pervious){
         this.#previousLivingCellsPerIteration = pervious
       }
   
-      static setPreviousDeadCellsPerIteration(pervious){
+      setPreviousDeadCellsPerIteration(pervious){
         this.#previousDeadCellsPerIteration = pervious
       }
 
-      static incrementIteration(){
+      incrementIteration(){
         ++this.#iteration
       }
 
-      static incrementFatalitiesOfUnderpopulation(){
+      incrementFatalitiesOfUnderpopulation(){
         ++this.#fatalitiesOfUnderpopulation
       }
 
-      static incrementLivingCellsPerIteration(){
+      incrementLivingCellsPerIteration(){
         ++this.#livingCellsPerIteration
       }
 
-      static incrementDeadCellsPerIteration(){
+      incrementDeadCellsPerIteration(){
         ++this.#deadCellsPerIteration
       }
 
-      static incrementFatalitiesOfUnderpopulation(){
+      incrementFatalitiesOfUnderpopulation(){
         ++this.#fatalitiesOfUnderpopulation
       }
 
-      static incrementFatalitiesOfOverpopulation(){
+      incrementFatalitiesOfOverpopulation(){
         ++this.#fatalitiesOfOverpopulation
       }
 
-      static incrementReproducedCells(){
+      incrementReproducedCells(){
         ++this.#reproducedCells
       }
 
-      static resetStatsPerIteration(){
+      resetStatsPerIteration(){
         this.#deadCellsPerIteration = 0
         this.#livingCellsPerIteration = 0
       }
       
-      static incrementStatsPerIterationForCell(cell){
+      incrementStatsPerIterationForCell(cell){
         cell.getIsAlive() ? this.incrementLivingCellsPerIteration() : this.incrementDeadCellsPerIteration() 
       }
 
-      static updateReasonOfDevelopment(cell){
+      updateReasonOfDevelopment(cell){
         if(cell.getIsOverpopulated())
           this.incrementFatalitiesOfOverpopulation()
     
@@ -98,23 +108,23 @@ export default class StatisticHandler {
           this.incrementReproducedCells()  
       }
 
-      static saveAndResetStatsPerIteration(){
+      saveAndResetStatsPerIteration(){
         this.saveStatsPerIteration()
         this.resetStatsPerIteration()
       }
     
-      static saveStatsPerIteration(){
+      saveStatsPerIteration(){
         let currentLivingCells = this.getLivingCellPerIteration()
         this.setPreviousLivingCellsPerIteration(currentLivingCells)
         let currentDeadCells = this.getDeadCellPerIteration()
         this.setPreviousDeadCellsPerIteration(currentDeadCells)
       }
 
-      static isCurrentGenEqualToPreviousGen(){
-        let currentDeadCells = StatisticHandler.getDeadCellPerIteration()
-        let currentLivingCells = StatisticHandler.getLivingCellPerIteration()
-        let previousDeadCells = StatisticHandler.getPreviousDeadCellsPerIteration()
-        let previousLivingCells = StatisticHandler.getPreviousLivingCellsPerIteration()
+      isCurrentGenEqualToPreviousGen(){
+        let currentDeadCells = this.getDeadCellPerIteration()
+        let currentLivingCells = this.getLivingCellPerIteration()
+        let previousDeadCells = this.getPreviousDeadCellsPerIteration()
+        let previousLivingCells = this.getPreviousLivingCellsPerIteration()
         return previousDeadCells == currentDeadCells && previousLivingCells == currentLivingCells
       }
 }

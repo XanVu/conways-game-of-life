@@ -1,7 +1,5 @@
 import Test from "./main";
-import StatisticHandler from "./StatisticHandler.js";
-import SphereOfLife from "./organism";
-import LoopConditionHandler from "./LoopConditionHandler.js";
+import live from "./Live.js";
 
 export default class HtmlHandler {
   static #formatter = new Intl.NumberFormat('de-De', {maximumSignificantDigits: 6}) 
@@ -39,15 +37,15 @@ export default class HtmlHandler {
     
 
         startButton.addEventListener("click", function(){
-           if(LoopConditionHandler.getIsAlive() && LoopConditionHandler.getIsEvolving() && !LoopConditionHandler.getIsRepeating()){
-            LoopConditionHandler.setHasStarted(true)
-            LoopConditionHandler.setStopped(false)
+           if(live.conditionValidator.getIsAlive() && live.conditionValidator.getIsEvolving() && !live.conditionValidator.getIsRepeating()){
+            live.conditionValidator.setHasStarted(true)
+            live.conditionValidator.setStopped(false)
             Test.recursiveLoop()
            } 
         }, false)
     
         stopButton.addEventListener("click", function(){
-          LoopConditionHandler.setStopped(true) 
+          live.conditionValidator.setStopped(true) 
         }, false)
 
         resetButton.addEventListener("click", function(){
@@ -57,7 +55,7 @@ export default class HtmlHandler {
     }
 
     static initHtmlTable() {
-        let array = SphereOfLife.getTable()
+        let array = live.getTable()
         let table = document.querySelector("table");
     
         for(var row = 0; row < array.length; row++){
@@ -114,12 +112,12 @@ export default class HtmlHandler {
         
         
         this.#addingStats(status, this.#determineStatus())
-        this.#addingStats(iteration, this.#formatter.format(StatisticHandler.getIteration()) + " generation")
-        this.#addingStats(underpopulation, this.#formatter.format(StatisticHandler.getFatalitiesOfUnderpopulation()) + " cells died by virtue of underpolulation!") 
-        this.#addingStats(overpopulation, this.#formatter.format(StatisticHandler.getFatalitiesOfOverpopulation()) + " cells died by virtue of overpolulation!") 
-        this.#addingStats(repoduction, this.#formatter.format(StatisticHandler.getReproducedCells()) + " cells came alive by virtue of reproduction!")
-        this.#addingStats(currentLiving, this.#formatter.format(StatisticHandler.getLivingCellPerIteration()) + " cells are currently alive!") 
-        this.#addingStats(currentDead, this.#formatter.format(StatisticHandler.getDeadCellPerIteration()) + " cells are currently dead!")   
+        this.#addingStats(iteration, this.#formatter.format(live.lifeStatistics.getIteration()) + " generation")
+        this.#addingStats(underpopulation, this.#formatter.format(live.lifeStatistics.getFatalitiesOfUnderpopulation()) + " cells died by virtue of underpolulation!") 
+        this.#addingStats(overpopulation, this.#formatter.format(live.lifeStatistics.getFatalitiesOfOverpopulation()) + " cells died by virtue of overpolulation!") 
+        this.#addingStats(repoduction, this.#formatter.format(live.lifeStatistics.getReproducedCells()) + " cells came alive by virtue of reproduction!")
+        this.#addingStats(currentLiving, this.#formatter.format(live.lifeStatistics.getLivingCellPerIteration()) + " cells are currently alive!") 
+        this.#addingStats(currentDead, this.#formatter.format(live.lifeStatistics.getDeadCellPerIteration()) + " cells are currently dead!")   
         
         
 
@@ -133,13 +131,13 @@ export default class HtmlHandler {
     static #determineStatus(){
       let text = "Status: Organism is alive!"
 
-      if(!LoopConditionHandler.getIsAlive())
+      if(!live.conditionValidator.getIsAlive())
         text = "Status: Organism is dead!"
       
-      if(!LoopConditionHandler.getIsEvolving())
+      if(!live.conditionValidator.getIsEvolving())
         text = "Status: stable configuration!"
 
-      if(LoopConditionHandler.getIsRepeating()){
+      if(live.conditionValidator.getIsRepeating()){
         text = "Status: stable repeating pattern!"
       }
       return text
