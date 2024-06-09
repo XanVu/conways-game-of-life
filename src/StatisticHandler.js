@@ -93,8 +93,8 @@ export default class StatisticHandler {
         this.#livingCellsPerIteration = 0
       }
       
-      incrementStatsPerIterationForCell(cell){
-        cell.getIsAlive() ? this.incrementLivingCellsPerIteration() : this.incrementDeadCellsPerIteration() 
+      incrementStatsPerIterationForCell(isCellAlive){
+        isCellAlive ? this.incrementLivingCellsPerIteration() : this.incrementDeadCellsPerIteration() 
       }
 
       updateReasonOfDevelopment(cell){

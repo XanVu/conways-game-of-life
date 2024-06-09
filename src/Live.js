@@ -1,7 +1,6 @@
 import StatisticHandler from "./StatisticHandler.js";
 import Cell from "./Cell.js";
 import ConditionValidator from "./ConditionValidator.js";
-import HtmlHandler from './HtmlHandler';
 
 let instance
 
@@ -60,29 +59,26 @@ class Live {
       let rowDepth = this.getRowDepth()
       let columnDepth = this.getColumnDepth()
       let table =  Array.from(new Array(rowDepth), () => new Array(columnDepth))
-     
+    
       for(var row = 0; row < table.length; row++){
         let x = table[row]
         for(var col = 0; col < x.length; col++){
-          let cell = (Math.random() > 0.75) ? new Cell(true) : new Cell(false)
-          this.lifeStatistics.incrementStatsPerIterationForCell(cell) 
+          let cell = (Math.random() > 0.75) ? new Cell(true) : new Cell(false) 
+          this.lifeStatistics.incrementStatsPerIterationForCell(cell.getIsAlive)
           table[row][col] = cell
         }
       }
+      
       this.setTable(table)
     }
 
     validateStock(array){
-      for(var row = 0; row < array.length; row++){
-        let x = array[row]
-        for(var col = 0; col < x.length; col++){
-            let cell = array[row][col]
+      array.forEach((subarray, row) => subarray.forEach((cell, col) => {
             let livingAdjacentCells = this.#livingAdjacentCells(row, col)
             cell.determineDevelopment(livingAdjacentCells)
             this.lifeStatistics.updateReasonOfDevelopment(cell)
-      }
+      }))
     }
-  }
 
   #livingAdjacentCells(row, col){
     let adjacentCellCoordinates = this.#getAdjacentCellCoordinates(row, col)
@@ -114,9 +110,10 @@ class Live {
     }
 
     #getCellbyCoordinate(coordinate){
+      let table = this.getTable()
       let row = coordinate[0]
       let col = coordinate[1]
-      return this.#table[row][col]
+      return table[row][col]
     }
 
     #calculateNumberOfLivingAdjacentCells(adjacentCells){
@@ -129,17 +126,13 @@ class Live {
       this.lifeStatistics.resetStatsPerIteration()
       this.lifeStatistics.incrementIteration()
     
-      for(var row = 0; row < array.length; row++){
-        let x = array[row]
-          for(var col = 0; col < x.length; col++){
-            const cell = this.#table[row][col]
+
+      array.forEach(subarray => subarray.forEach(cell => {
             cell.evolve()
-
-
-            this.lifeStatistics.incrementStatsPerIterationForCell(cell)
+            this.lifeStatistics.incrementStatsPerIterationForCell(cell.getIsAlive())
             this.conditionValidator.changeDetection(cell.getHasChanged())
-          }
-      }
+      }))
+
       this.conditionValidator.resetChangedAndConfirmEvolving()
   }
 }

@@ -5,6 +5,7 @@ import live from './Live';
     HtmlHandler.registerTabs()
     HtmlHandler.registerControls()
     live.startingLive()
+
     HtmlHandler.initHtmlTable()
   
 export default class Test {
