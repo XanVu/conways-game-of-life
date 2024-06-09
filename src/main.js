@@ -1,31 +1,28 @@
 'use strict';
 import HtmlHandler from './HtmlHandler';
-import LoopConditionHandler from './LoopConditionHandler';
-import SphereOfLife from './organism';
-
+import live from './Live';
 
     HtmlHandler.registerTabs()
     HtmlHandler.registerControls()
-
-    SphereOfLife.initEvolution(40)
+    live.startingLive()
     HtmlHandler.initHtmlTable()
   
 export default class Test {
 
     static recursiveLoop(){
-        let table = SphereOfLife.getTable()
+        let table = live.getTable()
 
-          SphereOfLife.validateStock(table)
-          SphereOfLife.evolveGeneration(table)
+          live.validateStock(table)
+          live.evolveGeneration(table)
 
-          LoopConditionHandler.executeHealthCheck()
-          LoopConditionHandler.setRepetitionFlag()
+          live.conditionValidator.executeHealthCheck()
+          live.conditionValidator.setRepetitionFlag()
           
           HtmlHandler.updateHtmlSpanInTable(table)
           HtmlHandler.setHtmlStatValues()
 
-          if(LoopConditionHandler.isLooping())
-            setTimeout(Test.recursiveLoop, SphereOfLife.getInterval())
+          if(live.conditionValidator.isLooping())
+            setTimeout(Test.recursiveLoop, live.getInterval())
     }
 }
 

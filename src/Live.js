@@ -1,0 +1,148 @@
+import StatisticHandler from "./StatisticHandler.js";
+import Cell from "./Cell.js";
+import ConditionValidator from "./ConditionValidator.js";
+import HtmlHandler from './HtmlHandler';
+
+let instance
+
+class Live {
+    #rowDepth = 45
+    #columDepth = 45
+    #table   
+    #interval = 0
+
+    conditionValidator
+    lifeStatistics
+
+    constructor(){
+      this.lifeStatistics = Object.freeze(new StatisticHandler())
+      this.conditionValidator = Object.freeze(new ConditionValidator(this.lifeStatistics))
+      
+      if (instance)
+        throw new Error("Singleton")
+      
+      instance = this
+    }
+
+    getTable(){
+      return this.#table
+    }
+
+    getRowDepth(){
+      return this.#rowDepth
+    }
+
+    getColumnDepth(){
+      return this.#columDepth
+    }
+
+    getInterval(){
+      return this.#interval
+    }
+
+    setRowDepth(size){
+       this.#rowDepth = size 
+    }
+
+    setColumnDepth(size){
+      this.#columDepth = size 
+   }
+
+    setTable(table){
+      this.#table = table 
+    } 
+
+    setInterval(interval){
+      this.#interval = interval
+    }
+
+    startingLive(){
+      let rowDepth = this.getRowDepth()
+      let columnDepth = this.getColumnDepth()
+      let table =  Array.from(new Array(rowDepth), () => new Array(columnDepth))
+     
+      for(var row = 0; row < table.length; row++){
+        let x = table[row]
+        for(var col = 0; col < x.length; col++){
+          let cell = (Math.random() > 0.75) ? new Cell(true) : new Cell(false)
+          this.lifeStatistics.incrementStatsPerIterationForCell(cell) 
+          table[row][col] = cell
+        }
+      }
+      this.setTable(table)
+    }
+
+    validateStock(array){
+      for(var row = 0; row < array.length; row++){
+        let x = array[row]
+        for(var col = 0; col < x.length; col++){
+            let cell = array[row][col]
+            let livingAdjacentCells = this.#livingAdjacentCells(row, col)
+            cell.determineDevelopment(livingAdjacentCells)
+            this.lifeStatistics.updateReasonOfDevelopment(cell)
+      }
+    }
+  }
+
+  #livingAdjacentCells(row, col){
+    let adjacentCellCoordinates = this.#getAdjacentCellCoordinates(row, col)
+    let adjacentCells = adjacentCellCoordinates.map(coordinate => this.#getCellbyCoordinate(coordinate))
+    return this.#calculateNumberOfLivingAdjacentCells(adjacentCells)
+  }
+
+  #getAdjacentCellCoordinates(row, col){
+    let rowDepth = this.getRowDepth()
+    let columnDepth = this.getColumnDepth()
+    let columns = Array((col - 1), col, ( col + 1)).map(index => this.#calculateValidIndex(index, columnDepth))
+    let rows = Array((row - 1), row, (row + 1)).map(index => this.#calculateValidIndex(index, rowDepth)) 
+    let cartesianProduct = rows.flatMap(row => columns.map(column => Array(row, column)))
+    let adjacentCells = cartesianProduct.filter(coordinateArray => !this.#isIdentity(row, col, coordinateArray))
+    return adjacentCells
+    }
+
+    #calculateValidIndex(index, size){
+      return this.#mod(index, size)
+     }
+  
+    #mod(a,b){
+      return a - (Math.floor(a / b) * b)
+    }
+
+    #isIdentity(row, col, array){
+      let identity = Array(row, col)
+      return array.every((element, index) => element === identity[index]);
+    }
+
+    #getCellbyCoordinate(coordinate){
+      let row = coordinate[0]
+      let col = coordinate[1]
+      return this.#table[row][col]
+    }
+
+    #calculateNumberOfLivingAdjacentCells(adjacentCells){
+      return adjacentCells.reduce((acc, cell) => {
+      return cell.getIsAlive() ? ++acc : acc}, 0);
+    }
+  
+    evolveGeneration(array){
+      this.lifeStatistics.saveStatsPerIteration()
+      this.lifeStatistics.resetStatsPerIteration()
+      this.lifeStatistics.incrementIteration()
+    
+      for(var row = 0; row < array.length; row++){
+        let x = array[row]
+          for(var col = 0; col < x.length; col++){
+            const cell = this.#table[row][col]
+            cell.evolve()
+
+
+            this.lifeStatistics.incrementStatsPerIterationForCell(cell)
+            this.conditionValidator.changeDetection(cell.getHasChanged())
+          }
+      }
+      this.conditionValidator.resetChangedAndConfirmEvolving()
+  }
+}
+
+let live = Object.freeze(new Live());
+export default live;

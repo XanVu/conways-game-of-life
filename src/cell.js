@@ -7,7 +7,6 @@ export default class Cell {
     #isReproducing = false
     #hasChanged = false
  
-    
     constructor(isAlive){
       this.#isAlive = isAlive
     }
