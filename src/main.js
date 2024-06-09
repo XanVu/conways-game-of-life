@@ -1,34 +1,31 @@
 'use strict';
 import HtmlHandler from './HtmlHandler';
-import Organism from './organism';
+import LoopConditionHandler from './LoopConditionHandler';
+import SphereOfLife from './organism';
 
 
     HtmlHandler.registerTabs()
     HtmlHandler.registerControls()
-
-
-    Organism.initEvolution(40)
+    
+    SphereOfLife.initEvolution(40)
     HtmlHandler.initHtmlTable()
   
 export default class Test {
 
     static recursiveLoop(){
-        let table = Organism.getTable()
+        let table = SphereOfLife.getTable()
 
-          Organism.validateStock(table)
-          Organism.evolveGeneration(table)
-          Organism.runHealthCheck()
-          Organism.detectRepetition()
+          SphereOfLife.validateStock(table)
+          SphereOfLife.evolveGeneration(table)
+
+          LoopConditionHandler.executeHealthCheck()
+          LoopConditionHandler.setRepetitionFlag()
           
           HtmlHandler.updateHtmlSpanInTable(table)
           HtmlHandler.setHtmlStatValues()
 
-
-            
-          if(Organism.getHasStarted() && !Organism.getHasStopped() && Organism.getIsAlive() && !Organism.getIsStable() && !Organism.getIsRepeating())
-            setTimeout(Test.recursiveLoop, Organism.getInterval())
-          
-            
+          if(LoopConditionHandler.isLooping())
+            setTimeout(Test.recursiveLoop, SphereOfLife.getInterval())
     }
 }
 

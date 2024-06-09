@@ -1,48 +1,12 @@
-import Cell from "./cell.js";
+import StatisticHandler from "./StatisticHandler.js";
+import Cell from "./Cell.js";
+import LoopConditionHandler from "./LoopConditionHandler.js";
 
-export default class Organism {
-    static #table 
-    static #repetitionCounter = 0
-    //controls
-    static #rowDepth = 45
-    static #columDepth = 40
-    static #interval = 0
-    static #repetitionThreshold = 5
-
-    //Stats
-    static #iteration = 0
-    static #livingCellsPerIteration = 0
-    static #deadCellsPerIteration = 0
-
-    static #fatalitiesOfOverpopulation = 0
-    static #fatalitiesOfUnderpopulation = 0
-    static #reproducedCells = 0
-
-    static #previousLivingCellsPerIteration = 0
-    static #previousDeadCellsPerIteration = 0
-
-    //Loop Cooditions
-    static #hasStarted = false
-    static #hasStopped = false
-    static #isStable = false
-    static #isAlive = true
-    static #isRepeating = false
-
-    static getPreviousLivingCellsPerIteration(){
-      return this.#previousLivingCellsPerIteration
-    }
-
-    static getPreviousDeadCellsPerIteration(){
-      return this.#previousDeadCellsPerIteration
-    }
-
-    static getRepetitionCounter(){
-      return this.#repetitionCounter
-    }
-
-    static getRepetitionThreshold(){
-      return this.#repetitionThreshold
-    }
+export default class SphereOfLife {
+    static #rowDepth = 15
+    static #columDepth = 15
+    static #table   
+    static #interval = 0 
 
     static getTable(){
       return this.#table
@@ -60,54 +24,6 @@ export default class Organism {
       return this.#interval
     }
 
-    static getTable(){
-      return this.#table
-    }
-
-    static getIteration(){
-      return this.#iteration
-    }
-
-    static getLivingCellPerIteration(){
-      return this.#livingCellsPerIteration
-    }
-
-    static getDeadCellPerIteration(){
-      return this.#deadCellsPerIteration
-    }
-
-    static getFatalitiesOfOverpopulation(){
-      return this.#fatalitiesOfOverpopulation
-    }
-
-    static getFatalitiesOfUnderpopulation(){
-      return this.#fatalitiesOfUnderpopulation
-    }
-
-    static getReproducedCells(){
-      return this.#reproducedCells
-    }
-
-    static getHasStarted(){
-      return this.#hasStarted
-    }
-
-    static getHasStopped(){
-      return this.#hasStopped
-    }
-
-    static getIsStable(){
-      return this.#isStable
-    }
-
-    static getIsAlive(){
-      return this.#isAlive
-    }
-
-    static getIsRepeating(){
-      return this.#isRepeating
-    }
-
     static setRowDepth(size){
        this.#rowDepth = size 
     }
@@ -120,54 +36,9 @@ export default class Organism {
       this.#table = table 
     } 
 
-    static getHasStarted(){
-      return this.#hasStarted
-    }
-
-    static setHasStarted(){
-      this.#hasStarted = true
-    }
-
-    static setStopped(bool){
-      this.#hasStopped = bool
-    }
-
     static setInterval(interval){
       this.#interval = interval
-    }
-
-    static setIteration(){
-     ++this.#iteration
-    }
-
-    static setIsAlive(bool){
-      this.#isAlive = bool
-    }
-
-    static setIsRepeating(bool){
-      this.#isRepeating = bool
-    }
-
-    static setRepetitionCounter(){
-      ++this.#repetitionCounter
-    }
-
-    static resetRepetitionCounter(){
-      this.#repetitionCounter = 0
-    }
-
-    static setPreviousLivingCellsPerIteration(number){
-      this.#previousLivingCellsPerIteration = number
-    }
-
-    static setPreviousDeadCellsPerIteration(number){
-      this.#previousDeadCellsPerIteration = number
-    }
-
-    static resetIterationStatsCounter(){
-      this.#deadCellsPerIteration = 0
-      this.#livingCellsPerIteration = 0
-    }
+  }
 
     static initTable(){
       let rowDepth = this.getRowDepth()
@@ -180,17 +51,13 @@ export default class Organism {
       for(var row = 0; row < array.length; row++){
         let x = array[row]
         for(var col = 0; col < x.length; col++){
-          let cell = this.#CreateCell()
+          let cell = (Math.random() > 0.75) ? new Cell(true) : new Cell(false)
+          StatisticHandler.incrementStatsPerIterationForCell(cell) 
           array[row][col] = cell
-          this.#setIterationStatsCounter(cell)
         }
       }
       return array
     }
-
-    static #CreateCell(){
-      return (Math.random() > 0.75) ? new Cell(true) : new Cell(false)
-     }
 
     static validateStock(array){
       for(var row = 0; row < array.length; row++){
@@ -199,7 +66,7 @@ export default class Organism {
             let cell = array[row][col]
             let livingAdjacentCells = this.#livingAdjacentCells(row, col)
             cell.determineDevelopment(livingAdjacentCells)
-            this.#updateStatsForCells(cell)
+            StatisticHandler.updateReasonOfDevelopment(cell)
       }
     }
   }
@@ -243,50 +110,22 @@ export default class Organism {
     return adjacentCells.reduce((acc, cell) => {
       return cell.getIsAlive() ? ++acc : acc}, 0);
   }
-
-  static #updateStatsForCells(cell){
-    if(cell.getIsOverpopulated())
-      ++this.#fatalitiesOfOverpopulation
-
-    if(cell.getIsUnderpopulated())
-      ++this.#fatalitiesOfUnderpopulation  
-
-    if(cell.getIsReproducing())
-      ++this.#reproducedCells  
-  }
   
   static evolveGeneration(array){
-    let acc = true
-    this.#saveCurrentStatsAndReset()
-
+    StatisticHandler.saveStatsPerIteration()
+    StatisticHandler.resetStatsPerIteration()
+    StatisticHandler.incrementIteration()
+    
     for(var row = 0; row < array.length; row++){
       let x = array[row]
       for(var col = 0; col < x.length; col++){
       const cell = this.#table[row][col]
       cell.evolve()
-      this.#setIterationStatsCounter(cell)
-      acc =  acc && cell.getIsUnchanged()     
+      StatisticHandler.incrementStatsPerIterationForCell(cell)
+      LoopConditionHandler.changeDetection(cell.getHasChanged())
       }
-    }  
-    this.#isStable = acc
-    this.setIteration()
-  }
-
-  static #saveCurrentStatsAndReset(){
-    this.setPreviousIterationStatsCounter()
-    this.resetIterationStatsCounter()
-  }
-
-  static #setIterationStatsCounter(cell){
-    cell.getIsAlive() == true ? ++this.#livingCellsPerIteration : ++this.#deadCellsPerIteration
-  }
-
-  static setPreviousIterationStatsCounter(){
-    let currentDeadCells = this.getDeadCellPerIteration()
-    let currentLivingCells = this.getLivingCellPerIteration()
-
-    this.setPreviousLivingCellsPerIteration(currentLivingCells)
-    this.setPreviousDeadCellsPerIteration(currentDeadCells)
+    }
+    LoopConditionHandler.resetChangedAndConfirmEvolving()
   }
 
   static initEvolution(){
@@ -294,28 +133,4 @@ export default class Organism {
       let table = this.getTable()
       return this.startingLive(table)
   }
-
- static detectRepetition(){
-  let previousDeadCells = this.getPreviousDeadCellsPerIteration()
-  let previousLivingCells = this.getPreviousLivingCellsPerIteration()
-
-  let currentDeadCells = this.getDeadCellPerIteration()
-  let currentLivingCells = this.getLivingCellPerIteration()
-
-  previousDeadCells == currentDeadCells && previousLivingCells == currentLivingCells ? this.setRepetitionCounter() : this.resetRepetitionCounter()
-
-  this.#validateRepetitionCondition()
- }
-
- static #validateRepetitionCondition(){
-  if(this.getRepetitionCounter() == this.getRepetitionThreshold()){  
-    this.setIsRepeating(true)
-  }
- }
-
- static runHealthCheck(){
-  if(Organism.getLivingCellPerIteration() == 0){
-    Organism.setIsAlive(false)
-  }
- }
 }
