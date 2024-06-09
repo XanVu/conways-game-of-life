@@ -4,8 +4,10 @@ import live from './Live';
 
     HtmlHandler.registerTabs()
     HtmlHandler.registerControls()
+    HtmlHandler.registerSlider()
+    
+    
     live.startingLive()
-
     HtmlHandler.initHtmlTable()
   
 export default class Test {

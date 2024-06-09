@@ -82,6 +82,10 @@ export default class ConditionValidator {
         this.#isEvolving = bool
     }
 
+    setRepetitionThreshold(value){
+        this.#repetitionThreshold = value
+    }
+
     
     incrementRepetitionCounter(){
         ++this.#repetitionCounter

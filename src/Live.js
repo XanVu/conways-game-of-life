@@ -6,9 +6,10 @@ let instance
 
 class Live {
     #rowDepth = 45
-    #columDepth = 45
+    #columDepth = 70
     #table   
     #interval = 0
+    #distribution = 0.75
 
     conditionValidator
     lifeStatistics
@@ -39,6 +40,10 @@ class Live {
       return this.#interval
     }
 
+    getDistribution(){
+      return this.#distribution
+    }
+
     setRowDepth(size){
        this.#rowDepth = size 
     }
@@ -55,6 +60,10 @@ class Live {
       this.#interval = interval
     }
 
+    setDistribution(distribution){
+      this.#distribution = distribution
+    }
+
     startingLive(){
       let rowDepth = this.getRowDepth()
       let columnDepth = this.getColumnDepth()
@@ -63,8 +72,8 @@ class Live {
       for(var row = 0; row < table.length; row++){
         let x = table[row]
         for(var col = 0; col < x.length; col++){
-          let cell = (Math.random() > 0.75) ? new Cell(true) : new Cell(false) 
-          this.lifeStatistics.incrementStatsPerIterationForCell(cell.getIsAlive)
+          let cell = (Math.random() > this.getDistribution()) ? new Cell(true) : new Cell(false) 
+          this.lifeStatistics.incrementStatsPerIterationForCell(cell.getIsAlive())
           table[row][col] = cell
         }
       }
@@ -118,7 +127,7 @@ class Live {
 
     #calculateNumberOfLivingAdjacentCells(adjacentCells){
       return adjacentCells.reduce((acc, cell) => {
-      return cell.getIsAlive() ? ++acc : acc}, 0);
+      return cell.getIsAlive() ? ++acc : acc}, 0 );
     }
   
     evolveGeneration(array){
