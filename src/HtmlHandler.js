@@ -39,9 +39,11 @@ export default class HtmlHandler {
     
 
         startButton.addEventListener("click", function(){
+           if(LoopConditionHandler.getIsAlive() && LoopConditionHandler.getIsEvolving() && !LoopConditionHandler.getIsRepeating()){
             LoopConditionHandler.setHasStarted(true)
-            Test.recursiveLoop()
             LoopConditionHandler.setStopped(false)
+            Test.recursiveLoop()
+           } 
         }, false)
     
         stopButton.addEventListener("click", function(){
