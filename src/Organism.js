@@ -4,7 +4,7 @@ import ConditionValidator from "./ConditionValidator.js";
 
 let instance
 
-class Live {
+class Organism {
     #rowDepth = 45
     #columDepth = 70
     #table   
@@ -146,5 +146,5 @@ class Live {
   }
 }
 
-let live = Object.freeze(new Live());
-export default live;
+let organism = Object.freeze(new Organism());
+export default organism;

@@ -1,19 +1,20 @@
 'use strict';
-import HtmlHandler from './HtmlHandler';
-import live from './Live';
+import presentationHandler from './OrganismPresentationHandler';
+import organism from "./Organism.js";
 
-    HtmlHandler.registerTabs()
-    HtmlHandler.registerControls()
-    HtmlHandler.registerSlider()
+presentationHandler.registerTabs()
+presentationHandler.registerControls()
+presentationHandler.registerSlider()
     
-    
-    live.startingLive()
-    HtmlHandler.initHtmlTable()
+presentationHandler.initHtmlTable()
   
 export default class Test {
 
     static recursiveLoop(){
-        let table = live.getTable()
+
+        let live = organism
+
+        let table = organism.getTable()
 
           live.validateStock(table)
           live.evolveGeneration(table)
@@ -21,8 +22,8 @@ export default class Test {
           live.conditionValidator.executeHealthCheck()
           live.conditionValidator.setRepetitionFlag()
           
-          HtmlHandler.updateHtmlSpanInTable(table)
-          HtmlHandler.setHtmlStatValues()
+          presentationHandler.updateHtmlSpanInTable(table)
+          presentationHandler.setHtmlStatValues()
 
           if(live.conditionValidator.isLooping())
             setTimeout(Test.recursiveLoop, live.getInterval())
