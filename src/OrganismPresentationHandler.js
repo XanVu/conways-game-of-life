@@ -1,27 +1,41 @@
-import Test from "./main";
-import live from "./Live.js";
+import Test from "./main.js";
+import organism from "./Organism.js";
 
-export default class HtmlHandler {
-  static threshold = 0
-  static interval = 0
-  static rows = 0
-  static columns = 0
-  static distribition = 0.0
+let instance
+class OrganismPresentationHandler {
+  interval = 0
+  organism
 
-  static #formatter = new Intl.NumberFormat('de-De', {maximumSignificantDigits: 6}) 
+  #formatter = new Intl.NumberFormat('de-De', {maximumSignificantDigits: 6}) 
 
-  static registerSlider(){
+
+
+
+  constructor(){
+    if (instance)
+      throw new Error("Singleton")
+    
+    instance = this 
+    
+    this.organism = organism
+  }
+
+  getOrganism(){
+    return this.organism
+  }
+
+  registerSlider(){
   
     let intervalSilder = document.getElementById("interval")
 
     intervalSilder.addEventListener("input", function(){
         this.interval = intervalSilder.value
-        live.setInterval(this.interval)
+        this.getOrganism.setInterval(this.interval)
     })
 
   }
 
-  static hideButtons(){
+  hideButtons(){
    
       let startButton = document.getElementById("Start")
       let stopButton = document.getElementById("Stop") 
@@ -29,7 +43,7 @@ export default class HtmlHandler {
       stopButton.classList.add('invisible')
   }
 
-  static registerTabs(){
+  registerTabs(){
         let tabContainer = document.getElementById("tabContainer")
 
         let buttonTabs = tabContainer.children
@@ -55,7 +69,7 @@ export default class HtmlHandler {
         }
     }
     
-   static registerControls(){
+   registerControls(){
         let startButton = document.getElementById("Start")
         let stopButton = document.getElementById("Stop") 
         let resetButton = document.getElementById("Reset")
@@ -64,15 +78,15 @@ export default class HtmlHandler {
     
 
         startButton.addEventListener("click", function(){
-           if(live.conditionValidator.getIsAlive() && live.conditionValidator.getIsEvolving() && !live.conditionValidator.getIsRepeating()){
-            live.conditionValidator.setHasStarted(true)
-            live.conditionValidator.setStopped(false)
+           if(organism.conditionValidator.getIsAlive() && organism.conditionValidator.getIsEvolving() && !organism.conditionValidator.getIsRepeating()){
+            organism.conditionValidator.setHasStarted(true)
+            organism.conditionValidator.setStopped(false)
             Test.recursiveLoop()
            } 
         }, false)
     
         stopButton.addEventListener("click", function(){
-          live.conditionValidator.setStopped(true) 
+          this.getOrganism().conditionValidator.setStopped(true) 
         }, false)
 
         resetButton.addEventListener("click", function(){
@@ -94,8 +108,10 @@ export default class HtmlHandler {
 
     }
 
-    static initHtmlTable() {
-        let array = live.getTable()
+    initHtmlTable() {
+        organism.startingLive()
+
+        let array = organism.getTable()
         let table = document.querySelector("table");
         array?.map( subArray => {
           let r = table.insertRow()
@@ -113,7 +129,7 @@ export default class HtmlHandler {
         this.setHtmlStatValues()
     }
     
-      static updateHtmlSpanInTable(array){
+      updateHtmlSpanInTable(array){
         for(var row = 0; row < array.length; row++){
           let x = array[row]
           for(var col = 0; col < x.length; col++){
@@ -128,7 +144,7 @@ export default class HtmlHandler {
         }
       }
     
-      static #setColorOfSpan(span, cell){
+      #setColorOfSpan(span, cell){
         if(cell.getIsAlive()){ 
             span.classList.remove(...span.classList)
             span.classList.add("livingCircle")
@@ -139,7 +155,7 @@ export default class HtmlHandler {
           }
     }
     
-    static setHtmlStatValues(){
+    setHtmlStatValues(){
 
         let underpopulation = document.getElementById("underpopulation")
         let overpopulation = document.getElementById("overpopulation")
@@ -152,37 +168,40 @@ export default class HtmlHandler {
         
         
         this.#addingStats(status, this.#determineStatus())
-        this.#addingStats(iteration, this.#formatter.format(live.lifeStatistics.getIteration()) + " generation")
-        this.#addingStats(underpopulation, this.#formatter.format(live.lifeStatistics.getFatalitiesOfUnderpopulation()) + " cells died by virtue of underpolulation!") 
-        this.#addingStats(overpopulation, this.#formatter.format(live.lifeStatistics.getFatalitiesOfOverpopulation()) + " cells died by virtue of overpolulation!") 
-        this.#addingStats(repoduction, this.#formatter.format(live.lifeStatistics.getReproducedCells()) + " cells came alive by virtue of reproduction!")
-        this.#addingStats(currentLiving, this.#formatter.format(live.lifeStatistics.getLivingCellPerIteration()) + " cells are currently alive!") 
-        this.#addingStats(currentDead, this.#formatter.format(live.lifeStatistics.getDeadCellPerIteration()) + " cells are currently dead!")   
+        this.#addingStats(iteration, this.#formatter.format(organism.lifeStatistics.getIteration()) + " generation")
+        this.#addingStats(underpopulation, this.#formatter.format(organism.lifeStatistics.getFatalitiesOfUnderpopulation()) + " cells died by virtue of underpolulation!") 
+        this.#addingStats(overpopulation, this.#formatter.format(organism.lifeStatistics.getFatalitiesOfOverpopulation()) + " cells died by virtue of overpolulation!") 
+        this.#addingStats(repoduction, this.#formatter.format(organism.lifeStatistics.getReproducedCells()) + " cells came alive by virtue of reproduction!")
+        this.#addingStats(currentLiving, this.#formatter.format(organism.lifeStatistics.getLivingCellPerIteration()) + " cells are currently alive!") 
+        this.#addingStats(currentDead, this.#formatter.format(organism.lifeStatistics.getDeadCellPerIteration()) + " cells are currently dead!")   
       
     }
 
-    static #addingStats(element, text){
+    #addingStats(element, text){
         element.textContent = text
     }
 
-    static #determineStatus(){
+     #determineStatus(){
       let text = "Status: Organism is alive!"
 
-      if(!live.conditionValidator.getIsAlive()){
+      if(!organism.conditionValidator.getIsAlive()){
         this.hideButtons()
         text = "Status: Organism is dead!"
       }
        
       
-      if(!live.conditionValidator.getIsEvolving()){
+      if(!organism.conditionValidator.getIsEvolving()){
         this.hideButtons()
         text = "Status: stable configuration!"
       }
        
-      if(live.conditionValidator.getIsRepeating()){
+      if(organism.conditionValidator.getIsRepeating()){
         this.hideButtons()
         text = "Status: stable repeating pattern!"
       }
       return text
     }
 }
+
+let presentationHandler = Object.freeze(new OrganismPresentationHandler());
+export default presentationHandler;
