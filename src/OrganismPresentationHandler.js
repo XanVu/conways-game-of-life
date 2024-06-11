@@ -1,5 +1,5 @@
-import Test from "./main.js";
 import organism from "./Organism.js";
+import { recursiveLoop } from  "./Organism.js";
 
 let instance
 class OrganismPresentationHandler {
@@ -7,9 +7,6 @@ class OrganismPresentationHandler {
   organism
 
   #formatter = new Intl.NumberFormat('de-De', {maximumSignificantDigits: 6}) 
-
-
-
 
   constructor(){
     if (instance)
@@ -75,15 +72,14 @@ class OrganismPresentationHandler {
         let resetButton = document.getElementById("Reset")
         let settingButton = document.getElementById("Setting")
         let settingContainer = document.getElementById("settingsContainer")
-    
+  
 
         startButton.addEventListener("click", function(){
            if(organism.conditionValidator.getIsAlive() && organism.conditionValidator.getIsEvolving() && !organism.conditionValidator.getIsRepeating()){
             organism.conditionValidator.setHasStarted(true)
             organism.conditionValidator.setStopped(false)
-            Test.recursiveLoop()
-           } 
-        }, false)
+            recursiveLoop()
+        }})
     
         stopButton.addEventListener("click", function(){
           this.getOrganism().conditionValidator.setStopped(true) 
@@ -129,7 +125,10 @@ class OrganismPresentationHandler {
         this.setHtmlStatValues()
     }
     
-      updateHtmlSpanInTable(array){
+      updateHtmlSpanInTable(){
+
+        let array = organism.getTable()
+
         for(var row = 0; row < array.length; row++){
           let x = array[row]
           for(var col = 0; col < x.length; col++){
@@ -142,6 +141,9 @@ class OrganismPresentationHandler {
             this.#setColorOfSpan(span, cell)
           }
         }
+
+        this.setHtmlStatValues()
+
       }
     
       #setColorOfSpan(span, cell){

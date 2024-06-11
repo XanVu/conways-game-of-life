@@ -1,6 +1,7 @@
 import StatisticHandler from "./StatisticHandler.js";
 import Cell from "./Cell.js";
 import ConditionValidator from "./ConditionValidator.js";
+import presentationHandler from './OrganismPresentationHandler';
 
 let instance
 
@@ -81,7 +82,8 @@ class Organism {
       this.setTable(table)
     }
 
-    validateStock(array){
+    validateStock(){
+      let array = this.getTable()
       array.forEach((subarray, row) => subarray.forEach((cell, col) => {
             let livingAdjacentCells = this.#livingAdjacentCells(row, col)
             cell.determineDevelopment(livingAdjacentCells)
@@ -130,11 +132,12 @@ class Organism {
       return cell.getIsAlive() ? ++acc : acc}, 0 );
     }
   
-    evolveGeneration(array){
+    evolveGeneration(){
       this.lifeStatistics.saveStatsPerIteration()
       this.lifeStatistics.resetStatsPerIteration()
       this.lifeStatistics.incrementIteration()
     
+      let array = this.getTable()
 
       array.forEach(subarray => subarray.forEach(cell => {
             cell.evolve()
@@ -144,7 +147,22 @@ class Organism {
 
       this.conditionValidator.resetChangedAndConfirmEvolving()
   }
-}
 
+}
 let organism = Object.freeze(new Organism());
 export default organism;
+
+
+export function recursiveLoop(){
+  organism.validateStock()
+  organism.evolveGeneration()
+  organism.conditionValidator.executeHealthCheck()
+  organism.conditionValidator.setRepetitionFlag()
+  
+
+  //call back would be nice 
+  presentationHandler.updateHtmlSpanInTable()
+
+  if(organism.conditionValidator.isLooping())
+    setTimeout(recursiveLoop, organism.getInterval())
+}
