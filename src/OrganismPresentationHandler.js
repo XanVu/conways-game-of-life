@@ -104,7 +104,7 @@ class OrganismPresentationHandler {
 
     }
 
-    initHtmlTable() {
+    loadOrganism(){
         organism.startingLive()
 
         let array = organism.getTable()
@@ -118,7 +118,6 @@ class OrganismPresentationHandler {
             let span = document.createElement("span")             
             c.appendChild(span)
             this.#setColorOfSpan(span, cell)
-
           })
         })
       
