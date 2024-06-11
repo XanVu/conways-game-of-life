@@ -4,4 +4,6 @@ import presentationHandler from './OrganismPresentationHandler';
 presentationHandler.registerTabs()
 presentationHandler.registerControls()
 presentationHandler.registerSlider()
-presentationHandler.initHtmlTable()
+
+
+presentationHandler.loadOrganism()
