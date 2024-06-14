@@ -1,9 +1,15 @@
 'use strict';
-import presentationHandler from './OrganismPresentationHandler';
+import navbar from './NavigationComponent';
+import controls from './ControlsComponent';
+import TableExtentions from './TableExtensions';
+import table from './TableComponent'
+import organism from './Organism';
+import statisticComponent from './StatisticComponent';
 
-presentationHandler.registerTabs()
-presentationHandler.registerControls()
-presentationHandler.registerSlider()
 
+navbar.loadingNavBarAndTabs()
+controls.loadingControls()
+organism.initializeTable()
+table.initializeTable()
+statisticComponent.loadStatisticTab()
 
-presentationHandler.loadOrganism()

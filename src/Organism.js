@@ -1,23 +1,23 @@
 import StatisticHandler from "./StatisticHandler.js";
 import Cell from "./Cell.js";
 import ConditionValidator from "./ConditionValidator.js";
-import presentationHandler from './OrganismPresentationHandler';
+import table from "./TableComponent.js";
+import statisticComponent from "./StatisticComponent.js";
 
 let instance
 
 class Organism {
     #rowDepth = 45
-    #columDepth = 70
+    #columDepth = 45
     #table   
     #interval = 0
-    #distribution = 0.75
 
     conditionValidator
-    lifeStatistics
+    statisticHandler
 
     constructor(){
-      this.lifeStatistics = Object.freeze(new StatisticHandler())
-      this.conditionValidator = Object.freeze(new ConditionValidator(this.lifeStatistics))
+      this.statisticHandler = new StatisticHandler(this.#getRowDepth(), this.#getColumnDepth())
+      this.conditionValidator = new ConditionValidator()
       
       if (instance)
         throw new Error("Singleton")
@@ -29,11 +29,11 @@ class Organism {
       return this.#table
     }
 
-    getRowDepth(){
+    #getRowDepth(){
       return this.#rowDepth
     }
 
-    getColumnDepth(){
+    #getColumnDepth(){
       return this.#columDepth
     }
 
@@ -41,16 +41,14 @@ class Organism {
       return this.#interval
     }
 
-    getDistribution(){
-      return this.#distribution
-    }
-
     setRowDepth(size){
-       this.#rowDepth = size 
+       this.#rowDepth = size
+       this.statisticHandler.setRowDimension(size)
     }
 
     setColumnDepth(size){
       this.#columDepth = size 
+      this.statisticHandler.setColumnDimension(size)
    }
 
     setTable(table){
@@ -61,25 +59,29 @@ class Organism {
       this.#interval = interval
     }
 
-    setDistribution(distribution){
-      this.#distribution = distribution
+
+    resetOrganism(){
+      this.setTable(null)
+      this.statisticHandler.initToDefault()
+      this.conditionValidator.initToDefault()
+      
+      this.initializeTable()
     }
 
-    startingLive(){
-      let rowDepth = this.getRowDepth()
-      let columnDepth = this.getColumnDepth()
-      let table =  Array.from(new Array(rowDepth), () => new Array(columnDepth))
+
+
+
+    initializeTable(){
+      let rowDepth = this.#getRowDepth()
+      let columnDepth = this.#getColumnDepth()
+      let table =  Array.from(Array(rowDepth), () => Array.from(Array(columnDepth), () => new Cell(false)))
     
-      for(var row = 0; row < table.length; row++){
-        let x = table[row]
-        for(var col = 0; col < x.length; col++){
-          let cell = (Math.random() > this.getDistribution()) ? new Cell(true) : new Cell(false) 
-          this.lifeStatistics.incrementStatsPerIterationForCell(cell.getIsAlive())
-          table[row][col] = cell
-        }
-      }
-      
-      this.setTable(table)
+      table.forEach(subarray => {
+        subarray.forEach(cell => {
+        cell.validateProbailityOfComingAlive()
+        this.statisticHandler.incrementStatsPerIterationForCell(cell.getIsAlive())
+      })})
+     this.setTable(table)   
     }
 
     validateStock(){
@@ -87,7 +89,7 @@ class Organism {
       array.forEach((subarray, row) => subarray.forEach((cell, col) => {
             let livingAdjacentCells = this.#livingAdjacentCells(row, col)
             cell.determineDevelopment(livingAdjacentCells)
-            this.lifeStatistics.updateReasonOfDevelopment(cell)
+            this.statisticHandler.updateReasonOfDevelopment(cell)
       }))
     }
 
@@ -98,8 +100,8 @@ class Organism {
   }
 
   #getAdjacentCellCoordinates(row, col){
-    let rowDepth = this.getRowDepth()
-    let columnDepth = this.getColumnDepth()
+    let rowDepth = this.#getRowDepth()
+    let columnDepth = this.#getColumnDepth()
     let columns = Array((col - 1), col, ( col + 1)).map(index => this.#calculateValidIndex(index, columnDepth))
     let rows = Array((row - 1), row, (row + 1)).map(index => this.#calculateValidIndex(index, rowDepth)) 
     let cartesianProduct = rows.flatMap(row => columns.map(column => Array(row, column)))
@@ -133,35 +135,43 @@ class Organism {
     }
   
     evolveGeneration(){
-      this.lifeStatistics.saveStatsPerIteration()
-      this.lifeStatistics.resetStatsPerIteration()
-      this.lifeStatistics.incrementIteration()
+      this.statisticHandler.saveStatsPerIteration()
+      this.statisticHandler.resetStatsPerIteration()
+      this.statisticHandler.incrementIteration()
     
       let array = this.getTable()
 
       array.forEach(subarray => subarray.forEach(cell => {
             cell.evolve()
-            this.lifeStatistics.incrementStatsPerIterationForCell(cell.getIsAlive())
+            this.statisticHandler.incrementStatsPerIterationForCell(cell.getIsAlive())
             this.conditionValidator.changeDetection(cell.getHasChanged())
       }))
 
       this.conditionValidator.resetChangedAndConfirmEvolving()
   }
 
+  setRepetitionFlag(){
+    let counter = this.statisticHandler.handleRepetitionCounter()
+    this.conditionValidator.inspectRepetitionCondition(counter)
+   }
 }
+
+
 let organism = Object.freeze(new Organism());
 export default organism;
-
 
 export function recursiveLoop(){
   organism.validateStock()
   organism.evolveGeneration()
-  organism.conditionValidator.executeHealthCheck()
-  organism.conditionValidator.setRepetitionFlag()
+
+  let livingCells = organism.statisticHandler.getLivingCellsPerIteration()
+  organism.conditionValidator.executeHealthCheck(livingCells)
+  organism.setRepetitionFlag()
   
 
   //call back would be nice 
-  presentationHandler.updateHtmlSpanInTable()
+  table.updateHtmlSpanInTable()
+  statisticComponent.loadStatisticTab()
 
   if(organism.conditionValidator.isLooping())
     setTimeout(recursiveLoop, organism.getInterval())

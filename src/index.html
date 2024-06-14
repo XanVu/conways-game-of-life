@@ -14,57 +14,41 @@
   <!-- Tab links -->
 
 <div id="flexContainer" > 
-    <div id ="tabContainer" class="nav">
-      <button id="StatsTab" class="tab-button">STATS</button>
-      <button id="RulesTab" class="tab-button">BASIC RULES</button>
-      <button id="DefinitionTab" class="tab-button">DEFINITION</button>
-    </div>
-    
+  <nav id="navigation" class="nav"></nav>    
+
     <div id="headline">
       <h1>CONWAY'S GAME OF LIFE</h1>
     </div>
 
     <div id="mainContainer">
   
-    <!-- Tab content -->
-    <div id="tabContentContainer">
-      <div id="Stats" class="tabcontent">
-        <h3>STATS</h3>
-        <p id="iteration"></p> 
-        <p id="currentLivingCells"></p>
-        <p id="currentDeadCells"></p>
-        <p id="underpopulation"></p>
-        <p id="overpopulation"></p>
-        <p id="reproduction"></p>
-        <p id="status"></p>  
+    <div id="tabContainer">
+      
+      <div>
+        <h3>BASIC RULES</h3>
+          <p>1. Any live cell with fewer than two live neighbors dies, as if by underpopulation.</p>
+          <p>2. Any live cell with two or three live neighbors lives on to the next generation.</p>
+          <p>3. Any live cell with more than three live neighbors dies, as if by overpopulation.</p>
+          <p>4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.</p>
+      </div>
+
+      <div>
+        <h3>DEFINITION</h3>
+          <p>The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. It is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and observing how it evolves. It is Turing complete and can simulate a universal constructor or any other Turing machine.</p>
+      </div>
     </div>
 
-    <div id="Rules" class="tabcontent invisible">
-      <h3>BASIC RULES</h3>
-        <p>1. Any live cell with fewer than two live neighbors dies, as if by underpopulation.</p>
-        <p>2. Any live cell with two or three live neighbors lives on to the next generation.</p>
-        <p>3. Any live cell with more than three live neighbors dies, as if by overpopulation.</p>
-        <p>4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.</p>
-    </div>
-
-    <div id="Definition" class="tabcontent invisible">
-      <h3>DEFINITION</h3>
-        <p>The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. It is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and observing how it evolves. It is Turing complete and can simulate a universal constructor or any other Turing machine.</p>
-    </div>
-  </div>
     <div id="tableContainer">
-      <div id="controlContainer"> 
-         <button id="Start" class="controls"> <i class="fa fa-play-circle-o fa-3x"></i></button>
-         <button id="Stop" class="controls"> <i class="fa fa-pause-circle-o fa-3x"></i></button>
-         <button id="Reset" class="controls"> <i class="fa fa-refresh fa-3x"></i></button> 
-         <button id="Setting" class="controls"> <i class="fa fa-cog fa-3x" aria-hidden="true"></i></button> 
+      <div id="controlsContainer"> 
       </div>
   
-      <div id="settingsContainer" class=" invisible"> 
-        <input id="interval" type="range" min="0" max="2000" value="0" step="100" class="slider">
-        <h5>PAUSE INTERVAL</h5>   
+      <div id="settingsContainer"> 
       </div>
+
+
       <table></table>
+    
+    
     </div>
   </div>
 </div>

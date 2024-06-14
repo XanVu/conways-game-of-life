@@ -2,35 +2,71 @@
 let instance
 
 export default class StatisticHandler {
-    #iteration = 1
-    #livingCellsPerIteration = 0
-    #deadCellsPerIteration = 0
-    #fatalitiesOfOverpopulation = 0
-    #fatalitiesOfUnderpopulation = 0
-    #reproducedCells = 0
+    static repetitionThreshold = 5
+    #rowDimensions
+    #columnDimensions
+    #repetitionCounter
+    #iteration
+    #livingCellsPerIteration
+    #fatalitiesOfOverpopulation
+    #fatalitiesOfUnderpopulation
+    #reproducedCells
+    #previousLivingCellsPerIteration
 
-    #previousLivingCellsPerIteration = 0
-    #previousDeadCellsPerIteration = 0
-
-    constructor(){
+    constructor(rowLength, colLength){
       if (instance)
         throw new Error("Singleton")
       
+      this.#rowDimensions = rowLength
+      this.#columnDimensions = colLength
+
+      this.initToDefault()
+
       instance = this;
     }
 
+    initToDefault(){
+      this.#repetitionCounter = 0
+      this.#iteration = 1
+      this.#livingCellsPerIteration = 0
+      this.#fatalitiesOfOverpopulation = 0
+      this.#fatalitiesOfUnderpopulation = 0
+      this.#reproducedCells = 0
+      this.#previousLivingCellsPerIteration = 0
+    }
+
+    getCurrentStatistics(){
+      const data = {
+        iteration: this.getIteration(),
+        livingCellsPerIteration:  this.getLivingCellsPerIteration(),
+        deadCellsPerIteration: this.calculateDeadCells(),
+        fatalitiesOfOverpopulation: this.getFatalitiesOfOverpopulation(),
+        fatalitiesOfUnderpopulation: this.getFatalitiesOfUnderpopulation(),
+        reproducedCells: this.getReproducedCells(),
+      }
+      return data
+    }
+
+    getRowDimensions(){
+      return this.#rowDimensions
+    }
+
+    getColumnDimensions(){
+      return this.#columnDimensions
+    }
+
+    getRepetitionCounter(){
+      return this.#repetitionCounter
+  }
+
     getIteration(){
         return this.#iteration
-      }
+    }
   
-    getLivingCellPerIteration(){
+    getLivingCellsPerIteration(){
       return this.#livingCellsPerIteration
     }
-  
-    getDeadCellPerIteration(){
-      return this.#deadCellsPerIteration
-    }
-  
+
       getFatalitiesOfOverpopulation(){
         return this.#fatalitiesOfOverpopulation
       }
@@ -47,18 +83,27 @@ export default class StatisticHandler {
         return this.#previousLivingCellsPerIteration
       }
   
-      getPreviousDeadCellsPerIteration(){
-        return this.#previousDeadCellsPerIteration
-      }
-
-
       setPreviousLivingCellsPerIteration(pervious){
         this.#previousLivingCellsPerIteration = pervious
       }
-  
-      setPreviousDeadCellsPerIteration(pervious){
-        this.#previousDeadCellsPerIteration = pervious
+
+      setRowDimension(value){
+        this.#rowDimensions = value
       }
+
+      setColumnDimension(value){
+        this.#columnDimensions = value
+      }
+
+
+
+    resetRepetitionCounter(){
+        this.#repetitionCounter = 0
+    }
+
+    incrementRepetitionCounter(){
+        ++this.#repetitionCounter
+    }
 
       incrementIteration(){
         ++this.#iteration
@@ -70,10 +115,6 @@ export default class StatisticHandler {
 
       incrementLivingCellsPerIteration(){
         ++this.#livingCellsPerIteration
-      }
-
-      incrementDeadCellsPerIteration(){
-        ++this.#deadCellsPerIteration
       }
 
       incrementFatalitiesOfUnderpopulation(){
@@ -89,12 +130,12 @@ export default class StatisticHandler {
       }
 
       resetStatsPerIteration(){
-        this.#deadCellsPerIteration = 0
         this.#livingCellsPerIteration = 0
       }
       
       incrementStatsPerIterationForCell(isCellAlive){
-        isCellAlive ? this.incrementLivingCellsPerIteration() : this.incrementDeadCellsPerIteration() 
+        if(isCellAlive)
+           this.incrementLivingCellsPerIteration()
       }
 
       updateReasonOfDevelopment(cell){
@@ -114,17 +155,23 @@ export default class StatisticHandler {
       }
     
       saveStatsPerIteration(){
-        let currentLivingCells = this.getLivingCellPerIteration()
+        let currentLivingCells = this.getLivingCellsPerIteration()
         this.setPreviousLivingCellsPerIteration(currentLivingCells)
-        let currentDeadCells = this.getDeadCellPerIteration()
-        this.setPreviousDeadCellsPerIteration(currentDeadCells)
       }
 
-      isCurrentGenEqualToPreviousGen(){
-        let currentDeadCells = this.getDeadCellPerIteration()
-        let currentLivingCells = this.getLivingCellPerIteration()
-        let previousDeadCells = this.getPreviousDeadCellsPerIteration()
+      handleRepetitionCounter(){
+        let currentLivingCells = this.getLivingCellsPerIteration()
         let previousLivingCells = this.getPreviousLivingCellsPerIteration()
-        return previousDeadCells == currentDeadCells && previousLivingCells == currentLivingCells
+        
+        if(previousLivingCells == currentLivingCells)
+          this.incrementRepetitionCounter()
+        else
+          this.resetRepetitionCounter()
+
+        return this.getRepetitionCounter  
+      }      
+
+      calculateDeadCells(){
+       return (this.getRowDimensions() * this.getColumnDimensions()) - this.getLivingCellsPerIteration()
       }
 }
