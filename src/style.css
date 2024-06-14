@@ -89,7 +89,7 @@ h3{
   float: right;
 }
 
-#tabContentContainer{
+#tabContainer {
   max-width: 20%;
   margin-left: 25px;
   background-color:#673e37;
@@ -106,13 +106,12 @@ h3{
   align-items: center;
 }
 
-#controlContainer{
+#controlsContainer{
   max-width: fit-content;
   background-color: white;
   border: 1px solid #ccc;
   margin-bottom: 15px;
   display: flex;
-  
 }
 
 .controls {
@@ -146,46 +145,50 @@ h3{
   text-align:center
 }
 
-.tab-button {
-  height: 65px;
-  color: white
-}
-
-
 /* Style the tab */
 .nav {
   background-color: #673e37;
   font-size: 1.25rem;
+ 
 }
 
 /* Style the buttons that are used to open the tab content */
-.nav button {
+.nav a {
   background-color: inherit;
   border: none;
   outline: none;
-  cursor: pointer;
-  padding: 14px 16px;
   transition: 0.3s;
-  margin: auto;
+  text-decoration: none; 
+  color: white;
 }
 
 /* Change background color of buttons on hover */
-.nav button:hover {
+.nav a:hover {
   background-color: #a79086
 }
 
 /* Create an active/current tablink class */
-.nav button.active {
+.nav a.active {
   background-color: #a79086
 }
 
+.nav li {
+  display: inline;
+}
+
+.nav li a{
+  text-align: center;
+  padding: 22px 20px;
+}
+
+
 /* Style the tab content */
-.tabcontent {
+.tabContent {
   padding: 6px 12px;
   text-align: left;
 }
 
-.invisible{
+.isHidden{
   display: none;
 }
 

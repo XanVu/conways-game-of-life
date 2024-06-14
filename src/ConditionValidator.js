@@ -1,27 +1,33 @@
-import StatisticHandler from "./StatisticHandler.js";
+import StatisticHandler from "./StatisticHandler"
 
 let instance
 
 export default class ConditionValidator {
-    #statisticHandler
-    #repetitionCounter = 0
-    #repetitionThreshold = 5
+    #hasStarted
+    #hasStopped
+    #isAlive
+    #isRepeating
+    #isEvolving
+    #changed
 
-    #hasStarted = false
-    #hasStopped = false
-    #isAlive = true
-    #isRepeating = false
-    #isEvolving = true
-    #changed = false
-
-    constructor(statisticHandler){
+    constructor(){
         if (instance)
           throw new Error("Singleton")
         
         instance = this;
-        this.#statisticHandler = statisticHandler
+
+        this.initToDefault()
     }
 
+    initToDefault(){
+        this.#hasStarted = false
+        this.#hasStopped = false
+        this.#isAlive = true
+        this.#isRepeating = false
+        this.#isEvolving = true
+        this.#changed = false
+    }
+    
     #getChanged(){
         return this.#changed
     }
@@ -44,14 +50,6 @@ export default class ConditionValidator {
   
     getIsRepeating(){
         return this.#isRepeating
-    }
-
-    getRepetitionCounter(){
-        return this.#repetitionCounter
-    }
-  
-    getRepetitionThreshold(){
-        return this.#repetitionThreshold
     }
 
     getHasStarted(){
@@ -81,32 +79,11 @@ export default class ConditionValidator {
     setIsEvolving(bool){
         this.#isEvolving = bool
     }
-
-    setRepetitionThreshold(value){
-        this.#repetitionThreshold = value
-    }
-
-    
-    incrementRepetitionCounter(){
-        ++this.#repetitionCounter
-    }
-  
-    
-    resetRepetitionCounter(){
-        this.#repetitionCounter = 0
-    }
-
-
-    setRepetitionFlag(){
-        this.#statisticHandler.isCurrentGenEqualToPreviousGen() ? this.incrementRepetitionCounter() : this.resetRepetitionCounter()
-        this.inspectRepetitionCondition()
-       }
       
-    inspectRepetitionCondition(){
-        if(this.getRepetitionCounter() == this.getRepetitionThreshold()){  
-          this.setIsRepeating(true)
-        }
-       }
+    inspectRepetitionCondition(repetitionCounter){
+        if(repetitionCounter == StatisticHandler.repetitionThreshold) 
+            this.setIsRepeating(true)
+    }
       
     changeDetection(hasChanged){
        if(hasChanged)
@@ -119,13 +96,12 @@ export default class ConditionValidator {
         this.setIsEvolving(changed)
     }
 
-    executeHealthCheck(){
-        if(this.#statisticHandler.getLivingCellPerIteration() == 0){
-          this.setIsAlive(false)
-        }
-    }
-
     isLooping(){
         return this.getHasStarted() && !this.getHasStopped() && this.getIsAlive() && this.getIsEvolving() && !this.getIsRepeating()
+    }
+
+    executeHealthCheck(livingCells){
+        if(livingCells == 0)
+          this.conditionValidator.setIsAlive(false)
     }
 }

@@ -1,4 +1,6 @@
 export default class Cell {
+    static #distribiton = 0.75
+  
     #isAlive = false
     #nextState = false
 
@@ -94,4 +96,11 @@ export default class Cell {
       this.#setHasChanged(hasChanged)
       this.#setIsAlive(this.getNextState())
     }
+
+
+    validateProbailityOfComingAlive(){
+      if(Math.random() > Cell.#distribiton)
+         this.#setIsAlive(true)
+    }
+
   }
