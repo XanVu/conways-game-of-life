@@ -64,12 +64,8 @@ class Organism {
       this.setTable(null)
       this.statisticHandler.initToDefault()
       this.conditionValidator.initToDefault()
-      
       this.initializeTable()
     }
-
-
-
 
     initializeTable(){
       let rowDepth = this.#getRowDepth()
@@ -136,9 +132,8 @@ class Organism {
   
     evolveGeneration(){
       this.statisticHandler.saveStatsPerIteration()
-      this.statisticHandler.resetStatsPerIteration()
+      this.statisticHandler.resetStatsPerIteration()    
       this.statisticHandler.incrementIteration()
-    
       let array = this.getTable()
 
       array.forEach(subarray => subarray.forEach(cell => {
@@ -161,18 +156,20 @@ let organism = Object.freeze(new Organism());
 export default organism;
 
 export function recursiveLoop(){
-  organism.validateStock()
-  organism.evolveGeneration()
+ 
+    if(organism.conditionValidator.isLooping()){
+    
+      organism.validateStock()
+      organism.evolveGeneration()
+      let livingCells = organism.statisticHandler.getLivingCellsPerIteration()
+      organism.conditionValidator.executeHealthCheck(livingCells)
+      organism.setRepetitionFlag()
 
-  let livingCells = organism.statisticHandler.getLivingCellsPerIteration()
-  organism.conditionValidator.executeHealthCheck(livingCells)
-  organism.setRepetitionFlag()
-  
 
-  //call back would be nice 
-  table.updateHtmlSpanInTable()
-  statisticComponent.loadStatisticTab()
-
-  if(organism.conditionValidator.isLooping())
-    setTimeout(recursiveLoop, organism.getInterval())
+      table.updateHtmlSpanInTable()
+      statisticComponent.loadStatisticTab()
+      
+      setTimeout(recursiveLoop, organism.getInterval())
+    }
+        
 }
