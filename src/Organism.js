@@ -7,8 +7,8 @@ import statisticComponent from "./StatisticComponent.js";
 let instance
 
 class Organism {
-    #rowDepth = 105
-    #columDepth = 105
+    #rowDepth = 45
+    #columDepth = 45
     #table   
     #interval = 0
 
