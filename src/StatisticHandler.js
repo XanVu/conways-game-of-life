@@ -93,8 +93,9 @@ export default class StatisticHandler {
 
       setColumnDimension(value){
         this.#columnDimensions = value
-      }
+      } 
 
+      
 
 
     resetRepetitionCounter(){
@@ -105,9 +106,9 @@ export default class StatisticHandler {
         ++this.#repetitionCounter
     }
 
-      incrementIteration(){
-        ++this.#iteration
-      }
+    #incrementIteration(){
+      ++this.#iteration
+    }
 
       incrementFatalitiesOfUnderpopulation(){
         ++this.#fatalitiesOfUnderpopulation
@@ -146,7 +147,10 @@ export default class StatisticHandler {
           this.incrementFatalitiesOfUnderpopulation()  
     
         if(cell.getIsReproducing())
-          this.incrementReproducedCells()  
+          this.incrementReproducedCells()
+        
+        if(cell.getIsAlive())
+          this.incrementLivingCellsPerIteration()
       }
 
       saveAndResetStatsPerIteration(){
@@ -157,6 +161,7 @@ export default class StatisticHandler {
       saveStatsPerIteration(){
         let currentLivingCells = this.getLivingCellsPerIteration()
         this.setPreviousLivingCellsPerIteration(currentLivingCells)
+        this.#incrementIteration()
       }
 
       handleRepetitionCounter(){
