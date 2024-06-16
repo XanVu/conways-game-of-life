@@ -79,28 +79,24 @@ export default class ConditionValidator {
         this.#isEvolving = bool
     }
       
-    inspectRepetitionCondition(repetitionCounter){
-        if(repetitionCounter == StatisticHandler.repetitionThreshold) 
-            this.setIsRepeating(true)
-    }
-      
-    changeDetection(hasChanged){
-       if(hasChanged)
+    changingCellExists(hasChanged){
+        if(hasChanged)
         this.#changed = true
     } 
 
-    resetChangedAndConfirmEvolving(){
+    validateInternnalLoopingConditions(repetitionCounter, livingCells){
+        if(repetitionCounter >= StatisticHandler.repetitionThreshold)
+            this.setIsRepeating(true)
+        
+        if(!livingCells == 0)
+            this.setIsAlive(true)
+        
         let changed = this.#getChanged()
-        this.#resetChanged()
         this.setIsEvolving(changed)
+        this.#resetChanged()
     }
 
     isLooping(){
-        return this.getHasStarted() && !this.getHasStopped() && this.getIsAlive() && this.getIsEvolving() && !this.getIsRepeating()
-    }
-
-    executeHealthCheck(livingCells){
-        if(livingCells == 0)
-          this.setIsAlive(false)
+        return this.getHasStarted() && !this.getHasStopped() && this.getIsAlive() && !this.getIsRepeating() && this.getIsEvolving()
     }
 }

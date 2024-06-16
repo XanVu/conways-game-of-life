@@ -16,18 +16,19 @@ class StatisticComponent {
   loadStatisticTab(){     
     let tab = navbar.getStatisticTab() 
     let currentStats = organism.statisticHandler.getCurrentStatistics()  
-    let statistics = this.#createNextStatisticsDiv(currentStats)
-    this.#deletePreviousStatisticIfPresent(tab)
-
+    
     let statusParagraph = this.#determineStatus()
-    statistics.appendChild(statusParagraph)
+    let statistics = this.#createNextStatisticsDiv(currentStats)
+    
+     statistics.insertBefore(statusParagraph, statistics.firstChild)
+    
+    this.#deletePreviousStatisticIfPresent(tab)
     tab.appendChild(statistics)
   }
 
 
   #createNextStatisticsDiv(currentStats){
     let textDiv = document.createElement('div')
-
     for(const property in currentStats){
         let formattedValue = this.#formatter.format(currentStats[property])
         let p = document.createElement('p')

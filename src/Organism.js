@@ -7,8 +7,8 @@ import statisticComponent from "./StatisticComponent.js";
 let instance
 
 class Organism {
-    #rowDepth = 45
-    #columDepth = 45
+    #rowDepth = 105
+    #columDepth = 105
     #table   
     #interval = 0
 
@@ -77,31 +77,41 @@ class Organism {
         cell.validateProbailityOfComingAlive()
         this.statisticHandler.incrementStatsPerIterationForCell(cell.getIsAlive())
       })})
+
+        this.statisticHandler.setPreviousLivingCellsPerIteration(this.statisticHandler.getLivingCellsPerIteration())
+
      this.setTable(table)   
     }
 
     validateStock(){
       let array = this.getTable()
+
+      let currentIteration = this.statisticHandler.getIteration()
+      let nextIterationValue = currentIteration + 1
+
+      this.statisticHandler.resetStatsPerIteration()
+
       array.forEach((subarray, row) => subarray.forEach((cell, col) => {
-            let livingAdjacentCells = this.#livingAdjacentCells(row, col)
-            cell.determineDevelopment(livingAdjacentCells)
+            let adjacentCells = this.#getAdjacentCells(row, col)
+            let livingAdjacentCells = this.#calculateNumberOfLivingAdjacentCells(adjacentCells, currentIteration)
+            cell.evolving(livingAdjacentCells, nextIterationValue)       
             this.statisticHandler.updateReasonOfDevelopment(cell)
-      }))
+            this.conditionValidator.changingCellExists(cell.getHasChanged())
+          }))      
+            let repetitionCounter = this.statisticHandler.handleRepetitionCounter()
+            let livingCells = this.statisticHandler.getLivingCellsPerIteration()
+            this.conditionValidator.validateInternnalLoopingConditions(repetitionCounter, livingCells)
+            this.statisticHandler.saveStatsPerIteration()     
     }
 
-  #livingAdjacentCells(row, col){
-    let adjacentCellCoordinates = this.#getAdjacentCellCoordinates(row, col)
-    let adjacentCells = adjacentCellCoordinates.map(coordinate => this.#getCellbyCoordinate(coordinate))
-    return this.#calculateNumberOfLivingAdjacentCells(adjacentCells)
-  }
-
-  #getAdjacentCellCoordinates(row, col){
+  #getAdjacentCells(row, col){
     let rowDepth = this.#getRowDepth()
     let columnDepth = this.#getColumnDepth()
     let columns = Array((col - 1), col, ( col + 1)).map(index => this.#calculateValidIndex(index, columnDepth))
-    let rows = Array((row - 1), row, (row + 1)).map(index => this.#calculateValidIndex(index, rowDepth)) 
-    let cartesianProduct = rows.flatMap(row => columns.map(column => Array(row, column)))
-    let adjacentCells = cartesianProduct.filter(coordinateArray => !this.#isIdentity(row, col, coordinateArray))
+    let rows = Array((row - 1), row, (row + 1)).map(index => this.#calculateValidIndex(index, rowDepth))
+    let identityPoint = {row: row, col: col}
+    let adjacentCellsCoordinates = rows.flatMap(row => columns.map(column => {return {row: row, col: column}})).filter(point => !(point.row == identityPoint.row && point.col == identityPoint.col))
+    let adjacentCells = adjacentCellsCoordinates.map(coordinate => this.#getCellbyCoordinate(coordinate.row, coordinate.col))
     return adjacentCells
     }
 
@@ -113,42 +123,20 @@ class Organism {
       return a - (Math.floor(a / b) * b)
     }
 
-    #isIdentity(row, col, array){
-      let identity = Array(row, col)
-      return array.every((element, index) => element === identity[index]);
-    }
-
-    #getCellbyCoordinate(coordinate){
+    #getCellbyCoordinate(row, col){
       let table = this.getTable()
-      let row = coordinate[0]
-      let col = coordinate[1]
-      return table[row][col]
+          return table[row][col]
     }
 
-    #calculateNumberOfLivingAdjacentCells(adjacentCells){
+    #calculateNumberOfLivingAdjacentCells(adjacentCells, currentIteration){
       return adjacentCells.reduce((acc, cell) => {
-      return cell.getIsAlive() ? ++acc : acc}, 0 );
+        
+        if(currentIteration != cell.getCurrentEvolutionStep())
+           return cell.getPreviousState() ? ++acc : acc
+         else
+          return cell.getIsAlive() ? ++acc : acc
+          }, 0 );
     }
-  
-    evolveGeneration(){
-      this.statisticHandler.saveStatsPerIteration()
-      this.statisticHandler.resetStatsPerIteration()    
-      this.statisticHandler.incrementIteration()
-      let array = this.getTable()
-
-      array.forEach(subarray => subarray.forEach(cell => {
-            cell.evolve()
-            this.statisticHandler.incrementStatsPerIterationForCell(cell.getIsAlive())
-            this.conditionValidator.changeDetection(cell.getHasChanged())
-      }))
-
-      this.conditionValidator.resetChangedAndConfirmEvolving()
-  }
-
-  setRepetitionFlag(){
-    let counter = this.statisticHandler.handleRepetitionCounter()
-    this.conditionValidator.inspectRepetitionCondition(counter)
-   }
 }
 
 
@@ -156,17 +144,10 @@ let organism = Object.freeze(new Organism());
 export default organism;
 
 export function recursiveLoop(){
- 
+
     if(organism.conditionValidator.isLooping()){
-    
+  
       organism.validateStock()
-      organism.evolveGeneration()
-      let livingCells = organism.statisticHandler.getLivingCellsPerIteration()
-      
-      organism.conditionValidator.executeHealthCheck(livingCells)
-      organism.setRepetitionFlag()
-
-
       table.updateHtmlSpanInTable()
       statisticComponent.loadStatisticTab()
       

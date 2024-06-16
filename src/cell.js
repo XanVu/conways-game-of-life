@@ -1,24 +1,32 @@
 export default class Cell {
     static #distribiton = 0.75
-  
-    #isAlive = false
-    #nextState = false
+
+    #currentEvolutionStep = 1
+
+    #isAlive
+
+    #previousState = false
 
     #isUnderpopulated = false
     #isOverpopulated = false
     #isReproducing = false
     #hasChanged = false
+
  
     constructor(isAlive){
       this.#isAlive = isAlive
+    }
+
+    getCurrentEvolutionStep(){
+      return this.#currentEvolutionStep
     }
     
     getIsAlive(){
       return this.#isAlive
     }  
     
-    getNextState(){
-      return this.#nextState
+    getPreviousState(){
+      return this.#previousState
     }
 
     getIsUnderpopulated(){
@@ -37,12 +45,17 @@ export default class Cell {
       return this.#hasChanged
     }
 
+    getPreviousState(){
+      return this.#previousState
+    }
+
+
     #setIsAlive(bool){
       this.#isAlive = bool
     }
 
-    #setNextState(bool){
-      this.#nextState = bool
+    #setPreviousState(bool){
+      this.#previousState = bool
     }
 
     #setIsUnderpopulated(bool){
@@ -61,6 +74,9 @@ export default class Cell {
       this.#hasChanged = bool
     }
 
+    #setCurrentEvolutionStep(value){
+      this.#currentEvolutionStep = value
+    }
 
 
     #isNotUnderpopulated(adjacentLivingCells){
@@ -76,31 +92,30 @@ export default class Cell {
     }
 
     #reproducing(adjacentLivingCells){
+      let currentState = this.getIsAlive()
       let isReproducing = adjacentLivingCells == 3
-      this.#setIsReproducing(isReproducing)   
-      this.#setNextState(isReproducing)
+      this.#setIsReproducing(isReproducing)
+      this.#setPreviousState(currentState) 
+      this.#setIsAlive(isReproducing)
+      this.#setHasChanged(isReproducing != currentState)   
       return isReproducing
     }
 
     #isSurviving(adjacentLivingCells){    
+      let currentState = this.getIsAlive()
       let isSurviving =  this.#isNotUnderpopulated(adjacentLivingCells) && this.#isNotOverpopulated(adjacentLivingCells)
-      this.#setNextState(isSurviving)
+      this.#setPreviousState(currentState) 
+      this.#setIsAlive(isSurviving)
+      this.#setHasChanged(isSurviving != currentState) 
     }
 
-    determineDevelopment(adjacentLivingCells){
+    evolving(adjacentLivingCells, evolutionStep){
       this.getIsAlive() ? this.#isSurviving(adjacentLivingCells) : this.#reproducing(adjacentLivingCells)
+      this.#setCurrentEvolutionStep(evolutionStep)
     }
-
-    evolve(){
-      let hasChanged = this.getIsAlive() != this.getNextState()
-      this.#setHasChanged(hasChanged)
-      this.#setIsAlive(this.getNextState())
-    }
-
 
     validateProbailityOfComingAlive(){
       if(Math.random() > Cell.#distribiton)
          this.#setIsAlive(true)
     }
-
   }
