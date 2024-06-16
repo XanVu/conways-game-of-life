@@ -162,6 +162,7 @@ export function recursiveLoop(){
       organism.validateStock()
       organism.evolveGeneration()
       let livingCells = organism.statisticHandler.getLivingCellsPerIteration()
+      
       organism.conditionValidator.executeHealthCheck(livingCells)
       organism.setRepetitionFlag()
 

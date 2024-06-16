@@ -162,13 +162,8 @@ export default class StatisticHandler {
       handleRepetitionCounter(){
         let currentLivingCells = this.getLivingCellsPerIteration()
         let previousLivingCells = this.getPreviousLivingCellsPerIteration()
-        
-        if(previousLivingCells == currentLivingCells)
-          this.incrementRepetitionCounter()
-        else
-          this.resetRepetitionCounter()
-
-        return this.getRepetitionCounter  
+        previousLivingCells == currentLivingCells ? this.incrementRepetitionCounter() : this.resetRepetitionCounter()
+        return this.getRepetitionCounter()
       }      
 
       calculateDeadCells(){
