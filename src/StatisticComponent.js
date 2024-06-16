@@ -1,4 +1,5 @@
 import navbar from "./NavigationComponent"
+import controls from './ControlsComponent';
 import organism from "./Organism"
 
 let instance
@@ -53,14 +54,35 @@ class StatisticComponent {
  
    
     if(!organism.conditionValidator.getIsAlive()){
+      
+      let b = controls.getStartButton()
+      let b1 = controls.getStopButton()
+
+      b.classList.add('isHidden')
+      b1.classList.add('isHidden')
+      
       status = "Status: Organism is dead!"
     }
    
     if(!organism.conditionValidator.getIsEvolving()){
+
+      let b = controls.getStartButton()
+      let b1 = controls.getStopButton()
+
+      b.classList.add('isHidden')
+      b1.classList.add('isHidden')
+
       status = "Status: stable configuration!"
     }
    
     if(organism.conditionValidator.getIsRepeating()){
+      
+      let b = controls.getStartButton()
+      let b1 = controls.getStopButton()
+
+      b.classList.add('isHidden')
+      b1.classList.add('isHidden')
+      
       status = "Status: stable repeating pattern!"
     }
 

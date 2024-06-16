@@ -8,7 +8,6 @@ class ControlsComponent {
     #settingsContainer
     #startButton
     #stopButton
-    #abortController
 
   constructor(){
     if (instance)
@@ -19,6 +18,15 @@ class ControlsComponent {
     this.#controlsContainer = document.getElementById('controlsContainer')
     this.#settingsContainer = document.getElementById('settingsContainer')
   }
+
+  getStartButton(){
+    return this.#startButton
+  }
+
+  getStopButton(){
+    return this.#stopButton
+  }
+
 
   #registerPlayButton(){
     let startButton = document.createElement('button')
@@ -33,21 +41,23 @@ class ControlsComponent {
 
     let f = this
 
-    startButton.addEventListener("click", f.test)
-    this.#controlsContainer.appendChild(startButton)
-  }
-
-  test(){
-      if(organism.conditionValidator.getIsAlive() && organism.conditionValidator.getIsEvolving() && !organism.conditionValidator.getIsRepeating()){
+    startButton.addEventListener("click", function() {
+  
+    if(organism.conditionValidator.getIsAlive() && organism.conditionValidator.getIsEvolving() && !organism.conditionValidator.getIsRepeating()){
          organism.conditionValidator.setHasStarted(true)
          organism.conditionValidator.setStopped(false)
          recursiveLoop()
-  }
+         this.classList.add('isHidden')
+         f.#stopButton.classList.remove('isHidden')
+    }})
+    this.#controlsContainer.appendChild(startButton)
   }
 
   #registerStopButton(){
     let stopButton = document.createElement('button')
     this.#stopButton = stopButton
+
+    stopButton.classList.add('isHidden')
 
     let icon = document.createElement('i')
 
@@ -55,9 +65,13 @@ class ControlsComponent {
 
     icon.classList.add(...iconClassList)
     stopButton.appendChild(icon)
+
+    let g = this
     
     stopButton.addEventListener('click', function(){
-        organism.conditionValidator.setStopped(true) 
+        organism.conditionValidator.setStopped(true)
+        this.classList.add('isHidden') 
+        g.#startButton.classList.remove('isHidden')
       })
 
     this.#controlsContainer.appendChild(stopButton)
@@ -77,8 +91,11 @@ class ControlsComponent {
 
     resetButton.addEventListener('click', () => {
          TableExtentions.resetTable()
-        f.#startButton.classList.remove('invisible')
-        f.#stopButton.classList.remove('invisible')
+        f.#startButton.classList.remove('isHidden')
+
+        f.#stopButton.classList.add('isHidden')
+
+
       })
 
       this.#controlsContainer.appendChild(resetButton)
@@ -117,12 +134,31 @@ class ControlsComponent {
   } 
 
   #registerSettingsTab(){
-    this.#settingsContainer.classList.add('isHidden')
-  }
+    let settingsTab = document.getElementById('settingsContainer')
+    settingsTab.classList.add('isHidden')
 
-  #registerIntervalSlider(){
+    let label = document.createElement('label')
+    label.textContent = "Interval Speed between Evolution"
+
+    settingsTab.appendChild(label)
+    
+    let slider = document.getElementById('sliderInput')
+    let sliderDiv = document.getElementById('slider')
+
     let intervals = ['FAST', 'MEDIUM', 'SLOW']
+  
+    for (var i = 0; i < intervals.length; i++) {
+      let span = document.createElement('span')
+      span.textContent = intervals[i]
+      sliderDiv.append(span);
+    }
 
+    settingsTab.appendChild(slider)   
+    settingsTab.appendChild(sliderDiv)
+
+    slider.addEventListener('input',() => {
+      organism.setInterval(slider.value)
+    })
   }
 
 
