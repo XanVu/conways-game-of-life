@@ -8,13 +8,14 @@ class ControlsComponent {
     #settingsContainer
     #startButton
     #stopButton
+    #abortController
 
   constructor(){
     if (instance)
       throw new Error("Singleton")
     
     instance = this 
-    
+
     this.#controlsContainer = document.getElementById('controlsContainer')
     this.#settingsContainer = document.getElementById('settingsContainer')
   }
@@ -30,14 +31,18 @@ class ControlsComponent {
 
     this.#startButton = startButton
 
-    startButton.addEventListener("click", function(){
-        if(organism.conditionValidator.getIsAlive() && organism.conditionValidator.getIsEvolving() && !organism.conditionValidator.getIsRepeating()){
+    let f = this
+
+    startButton.addEventListener("click", f.test)
+    this.#controlsContainer.appendChild(startButton)
+  }
+
+  test(){
+      if(organism.conditionValidator.getIsAlive() && organism.conditionValidator.getIsEvolving() && !organism.conditionValidator.getIsRepeating()){
          organism.conditionValidator.setHasStarted(true)
          organism.conditionValidator.setStopped(false)
          recursiveLoop()
-     }})
-
-     this.#controlsContainer.appendChild(startButton)
+  }
   }
 
   #registerStopButton(){
@@ -51,7 +56,7 @@ class ControlsComponent {
     icon.classList.add(...iconClassList)
     stopButton.appendChild(icon)
     
-    stopButton.addEventListener("click", function(){
+    stopButton.addEventListener('click', function(){
         organism.conditionValidator.setStopped(true) 
       })
 
@@ -68,12 +73,10 @@ class ControlsComponent {
     icon.classList.add(...iconClassList)
     resetButton.appendChild(icon)
 
-
     let f = this
 
-    resetButton.addEventListener("click", function(){
-        TableExtentions.resetTable()
-  
+    resetButton.addEventListener('click', () => {
+         TableExtentions.resetTable()
         f.#startButton.classList.remove('invisible')
         f.#stopButton.classList.remove('invisible')
       })
@@ -94,7 +97,7 @@ class ControlsComponent {
     settingButton.appendChild(icon)
 
 
-    settingButton.addEventListener("click", function(){
+    settingButton.addEventListener('click', function(){
         if(settingsContainer.classList.contains('isHidden'))
             settingsContainer.classList.remove('isHidden')
         else

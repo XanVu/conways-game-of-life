@@ -15,30 +15,37 @@ class StatisticComponent {
 
   loadStatisticTab(){     
     let tab = navbar.getStatisticTab() 
-    let currentStats = organism.statisticHandler.getCurrentStatistics()
-
-    if(tab.hasChildNodes())
-      tab.replaceChildren()
-
-    let list = document.createElement('ul')
-
-    for(const property in currentStats){
-        let value = currentStats[property]
-
-        if(currentStats[property] == Number){
-            value = this.#formatter(currentStats[property])
-        }
-        this.#addListItem(list, `${property}: ${value}`)
-    }
-    tab.appendChild(list)
+    let currentStats = organism.statisticHandler.getCurrentStatistics()  
+    let statistics = this.#createNextStatisticsDiv(currentStats)
+    this.#deletePreviousStatisticIfPresent(tab)
+    tab.appendChild(statistics)
   }
 
 
-  #addListItem(list, text){
-    let item = document.createElement('li')    
-    item.textContent = text
-    list.appendChild(item)
-}
+  #createNextStatisticsDiv(currentStats){
+    let textDiv = document.createElement('div')
+
+    for(const property in currentStats){
+        let formattedValue = this.#formatNumericalValues(currentStats[property])
+        let p = document.createElement('p')
+        p.textContent = `${property}: ${formattedValue}`
+        textDiv.appendChild(p)
+    }
+    return textDiv
+  }
+
+  #formatNumericalValues(value){
+    value == Number ? this.#formatter.format(value) : value
+  }
+
+  #deletePreviousStatisticIfPresent(tab){
+    let container = tab.getElementsByTagName('div')
+
+    if(container.length == 1){
+       let oldStatistics = container.item(0)
+       tab.removeChild(oldStatistics)
+    }
+  }
 
  #determineStatus(){
   let text = "Status: Organism is alive!"
