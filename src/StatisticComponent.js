@@ -18,6 +18,9 @@ class StatisticComponent {
     let currentStats = organism.statisticHandler.getCurrentStatistics()  
     let statistics = this.#createNextStatisticsDiv(currentStats)
     this.#deletePreviousStatisticIfPresent(tab)
+
+    let statusParagraph = this.#determineStatus()
+    statistics.appendChild(statusParagraph)
     tab.appendChild(statistics)
   }
 
@@ -26,16 +29,12 @@ class StatisticComponent {
     let textDiv = document.createElement('div')
 
     for(const property in currentStats){
-        let formattedValue = this.#formatNumericalValues(currentStats[property])
+        let formattedValue = this.#formatter.format(currentStats[property])
         let p = document.createElement('p')
         p.textContent = `${property}: ${formattedValue}`
         textDiv.appendChild(p)
     }
     return textDiv
-  }
-
-  #formatNumericalValues(value){
-    value == Number ? this.#formatter.format(value) : value
   }
 
   #deletePreviousStatisticIfPresent(tab){
@@ -48,24 +47,24 @@ class StatisticComponent {
   }
 
  #determineStatus(){
-  let text = "Status: Organism is alive!"
-
+  let statusParagraph = document.createElement('p')
+  let status = "Status: Organism is alive!"
+ 
+   
     if(!organism.conditionValidator.getIsAlive()){
-      this.hideButtons()
-      text = "Status: Organism is dead!"
+      status = "Status: Organism is dead!"
     }
    
     if(!organism.conditionValidator.getIsEvolving()){
-      this.hideButtons()
-      text = "Status: stable configuration!"
+      status = "Status: stable configuration!"
     }
    
     if(organism.conditionValidator.getIsRepeating()){
-      this.hideButtons()
-      text = "Status: stable repeating pattern!"
+      status = "Status: stable repeating pattern!"
     }
 
-  return text
+    statusParagraph.textContent = status
+  return statusParagraph
   }
 }
 

@@ -15,7 +15,6 @@ export default class ConditionValidator {
           throw new Error("Singleton")
         
         instance = this;
-
         this.initToDefault()
     }
 
@@ -102,6 +101,6 @@ export default class ConditionValidator {
 
     executeHealthCheck(livingCells){
         if(livingCells == 0)
-          this.conditionValidator.setIsAlive(false)
+          this.setIsAlive(false)
     }
 }
