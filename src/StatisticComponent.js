@@ -30,10 +30,13 @@ class StatisticComponent {
 
   #createNextStatisticsDiv(currentStats){
     let textDiv = document.createElement('div')
-    for(const property in currentStats){
-        let formattedValue = this.#formatter.format(currentStats[property])
+
+    let textArray = ['currerent Generation', 'cells are living in the current Generation.', 'cells are dead in the current Generation.' , 'cells died by virtue of overpolulation.', 'cells died by virtue of underpopulation.', 'cells came alive by virtue of reproduction.']
+
+    for(const [index, [_, value]] of Object.entries(Object.entries(currentStats))){
+        let formattedValue = this.#formatter.format(value)
         let p = document.createElement('p')
-        p.textContent = `${property}: ${formattedValue}`
+        p.innerHTML = `${formattedValue} <br/> ${textArray[index]}`
         textDiv.appendChild(p)
     }
     return textDiv
