@@ -92,10 +92,7 @@ class ControlsComponent {
     resetButton.addEventListener('click', () => {
          TableExtentions.resetTable()
         f.#startButton.classList.remove('isHidden')
-
         f.#stopButton.classList.add('isHidden')
-
-
       })
 
       this.#controlsContainer.appendChild(resetButton)
