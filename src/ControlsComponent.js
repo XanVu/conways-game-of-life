@@ -8,6 +8,7 @@ class ControlsComponent {
     #settingsContainer
     #startButton
     #stopButton
+    #wrapper
 
   constructor(){
     if (instance)
@@ -17,6 +18,7 @@ class ControlsComponent {
 
     this.#controlsContainer = document.getElementById('controlsContainer')
     this.#settingsContainer = document.getElementById('settingsContainer')
+    this.#wrapper = document.getElementById('wrapper')
   }
 
   getStartButton(){
@@ -101,7 +103,7 @@ class ControlsComponent {
   #registerSettingsButton(){
     let settingButton = document.createElement('button')
 
-    let settingsContainer = this.#settingsContainer
+    let wrap = this.#wrapper
 
     let icon = document.createElement('i')
 
@@ -112,10 +114,10 @@ class ControlsComponent {
 
 
     settingButton.addEventListener('click', function(){
-        if(settingsContainer.classList.contains('isHidden'))
-            settingsContainer.classList.remove('isHidden')
+        if(wrap.classList.contains('isHidden'))
+          wrap.classList.remove('isHidden')
         else
-        settingsContainer.classList.add('isHidden')
+        wrap.classList.add('isHidden')
     })
 
     this.#controlsContainer.appendChild(settingButton)
@@ -137,7 +139,7 @@ class ControlsComponent {
     let label = document.createElement('label')
     label.textContent = "Interval Speed between Evolution"
 
-    settingsTab.appendChild(label)
+    //settingsTab.appendChild(label)
     
     let slider = document.getElementById('sliderInput')
     let sliderDiv = document.getElementById('slider')

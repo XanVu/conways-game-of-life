@@ -26,14 +26,6 @@ body {
   align-items: stretch;
 }
 
-#mainContainer{
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin: auto;
-}
-
 #headline{
   height: 60px;
   text-align: center;
@@ -51,45 +43,61 @@ h3{
 }
 
 #settingsContainer{
-  margin: auto;
-  background-color:#673e37;
-  width: 60%;
-  padding: 10px;
-  margin-bottom: 15px;
+  margin-left: 20px;
+  height: 60%;
   height: fit-content;
+  width: 10%;
   text-align: center;
-  color: white
+  display: flex;
+}
+
+#sliderInput{
+  padding: 5px;
 }
 
 #tabContainer {
-  width: 20%;
-  margin-left: 25px;
+  width: 75%;
+  margin: auto;
   background-color:#673e37;
   color:white;
-  position: absolute;
-  left:0;
 }
 
-#tableContainer{
-  max-width: fit-content;
-  position: relative;
+.left, .right {
+  flex-grow: 1;
+  flex-basis: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
 }
 
+
+#mainContainer{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+#tableContainer{ 
+  display: flex;
+  max-width: fit-content; 
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 #controlsContainer{
+  margin:  20px auto;
   max-width: fit-content;
   background-color: white;
   border: 1px solid #ccc;
-  margin-bottom: 15px;
   display: flex;
+  align-items: center;
 }
 
 #slider{
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  padding: 0 25px;
+  padding-left: 10px;
 }
 
 .controls {
@@ -174,6 +182,52 @@ p{
   font-size: 1.2rem;
   padding: 5px;
 }
+
+
+input[type="range"] { 
+  -webkit-appearance: none;
+  appearance: none;
+  writing-mode: vertical-lr;
+  background-color: transparent;
+  height: 35%;
+  &:focus {
+    outline-color: #f8b195;
+  }
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  writing-mode: vertical-lr;
+  border-radius: 25px;
+  background: rgb(246, 114, 128);
+  background: -webkit-linear-gradient(
+    top,
+    rgba(246, 114, 128, 1) 0%,
+    rgba(192, 108, 132, 1) 50%,
+    rgba(53, 92, 125, 1) 100%
+  );
+  background: linear-gradient(
+    bottom,
+    rgba(246, 114, 128, 1) 0%,
+    rgba(192, 108, 132, 1) 50%,
+    rgba(53, 92, 125, 1) 100%
+  );
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 2px solid #6d031c;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  writing-mode: vertical-lr;
+  box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.90);
+}
+
+
 
 
 /* Opinionated CSS defaults based on:
@@ -273,148 +327,3 @@ progress {
 [hidden] {
   display: none;
 }
-
-
-
-
-input[type="range"] {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  width: 80%;
-  background-color: transparent;
-  margin-bottom: 15px;
-  &:focus {
-    outline-color: #f8b195;
-  }
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 3px;
-  background: rgb(246, 114, 128);
-  background: -webkit-linear-gradient(
-    left,
-    rgba(246, 114, 128, 1) 0%,
-    rgba(192, 108, 132, 1) 50%,
-    rgba(53, 92, 125, 1) 100%
-  );
-  background: linear-gradient(
-    to right,
-    rgba(246, 114, 128, 1) 0%,
-    rgba(192, 108, 132, 1) 50%,
-    rgba(53, 92, 125, 1) 100%
-  );
-  filter: progid:DXImageTransform.Microsoft.gradient(
-    startColorstr="#f67280",
-    endColorstr="#355c7d",
-    GradientType=1
-  );
-}
-
-input[type="range"]::-moz-range-track {
-  -moz-appearance: none;
-  appearance: none;
-  height: 3px;
-  background: rgb(246, 114, 128);
-  background: -moz-linear-gradient(
-    left,
-    rgba(246, 114, 128, 1) 0%,
-    rgba(192, 108, 132, 1) 50%,
-    rgba(53, 92, 125, 1) 100%
-  );
-  background: linear-gradient(
-    to right,
-    rgba(246, 114, 128, 1) 0%,
-    rgba(192, 108, 132, 1) 50%,
-    rgba(53, 92, 125, 1) 100%
-  );
-  filter: progid:DXImageTransform.Microsoft.gradient(
-    startColorstr="#f67280",
-    endColorstr="#355c7d",
-    GradientType=1
-  );
-}
-
-input[type="range"]::-ms-track {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  height: 3px;
-  background: rgb(246, 114, 128);
-  background: -moz-linear-gradient(
-    left,
-    rgba(246, 114, 128, 1) 0%,
-    rgba(192, 108, 132, 1) 50%,
-    rgba(53, 92, 125, 1) 100%
-  );
-  background: -webkit-linear-gradient(
-    left,
-    rgba(246, 114, 128, 1) 0%,
-    rgba(192, 108, 132, 1) 50%,
-    rgba(53, 92, 125, 1) 100%
-  );
-  background: linear-gradient(
-    to right,
-    rgba(246, 114, 128, 1) 0%,
-    rgba(192, 108, 132, 1) 50%,
-    rgba(53, 92, 125, 1) 100%
-  );
-  filter: progid:DXImageTransform.Microsoft.gradient(
-    startColorstr="#f67280",
-    endColorstr="#355c7d",
-    GradientType=1
-  );
-}
-
-input[type="range"]::-webkit-slider-thumb {
--webkit-appearance: none;
-appearance: none;
-border: 2px solid #f8b195;
-border-radius: 50%;
-height: 20px;
-width: 20px;
-position: relative;
-bottom: 8px;
-background: #222
-  url("http://codemenatalie.com/wp-content/uploads/2019/09/slider-thumb.png")
-  center no-repeat;
-background-size: 50%;
-box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.4);
-}
-
-
-input[type="range"]::-moz-range-thumb {
-  -moz-appearance: none;
-  appearance: none;
-  border: 2px solid #f8b195;
-  border-radius: 50%;
-  height: 20px;
-  width: 20px;
-  position: relative;
-  bottom: 8px;
-  background: #222
-    url("http://codemenatalie.com/wp-content/uploads/2019/09/slider-thumb.png")
-    center no-repeat;
-  background-size: 50%;
-  box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.4);
-}
-
-input[type="range"]::-ms-thumb {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 2px solid #f8b195;
-  border-radius: 50%;
-  height: 20px;
-  width: 20px;
-  position: relative;
-  bottom: 8px;
-  background: #222
-    url("http://codemenatalie.com/wp-content/uploads/2019/09/slider-thumb.png")
-    center no-repeat;
-  background-size: 50%;
-  box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.4);
-}
-
