@@ -25,25 +25,30 @@ class StatisticComponent {
     
     this.#deletePreviousStatisticIfPresent(tab)
     tab.appendChild(statistics)
+
+    organism.statisticHandler.resetStatsPerIteration()
   }
 
 
   #createNextStatisticsDiv(currentStats){
-    let textDiv = document.createElement('div')
+    let dl = document.createElement('dl')
 
-    let textArray = ['currerent Generation', 'cells are living in the current Generation.', 'cells are dead in the current Generation.' , 'cells died by virtue of overpolulation.', 'cells died by virtue of underpopulation.', 'cells came alive by virtue of reproduction.']
+    let textArray = ['Generation:', 'living Cells:', 'dead Cells:' , 'Death by Overpolulation:', 'Death by Underpopulation:', 'Resurrection by Reproduction']
 
     for(const [index, [_, value]] of Object.entries(Object.entries(currentStats))){
         let formattedValue = this.#formatter.format(value)
-        let p = document.createElement('p')
-        p.innerHTML = `${formattedValue} <br/> ${textArray[index]}`
-        textDiv.appendChild(p)
+        let dt = document.createElement('dt')
+        let dd = document.createElement('dd')
+        dt.textContent = textArray[index]
+        dd.textContent = formattedValue
+        dt.appendChild(dd)
+        dl.appendChild(dt)
     }
-    return textDiv
+    return dl
   }
 
   #deletePreviousStatisticIfPresent(tab){
-    let container = tab.getElementsByTagName('div')
+    let container = tab.getElementsByTagName('dl')
 
     if(container.length == 1){
        let oldStatistics = container.item(0)
@@ -52,10 +57,9 @@ class StatisticComponent {
   }
 
  #determineStatus(){
-  let statusParagraph = document.createElement('p')
+  let dt = document.createElement('dt')
   let status = "Status: Organism is alive!"
- 
-   
+
     if(!organism.conditionValidator.getIsAlive()){
       
       let b = controls.getStartButton()
@@ -75,7 +79,7 @@ class StatisticComponent {
       b.classList.add('isHidden')
       b1.classList.add('isHidden')
 
-      status = "Status: stable configuration!"
+      status = "Status: Stable configuration!"
     }
    
     if(organism.conditionValidator.getIsRepeating()){
@@ -86,11 +90,11 @@ class StatisticComponent {
       b.classList.add('isHidden')
       b1.classList.add('isHidden')
       
-      status = "Status: stable repeating pattern!"
+      status = "Status: Stable repeating pattern!"
     }
 
-    statusParagraph.textContent = status
-  return statusParagraph
+    dt.textContent = status
+  return dt
   }
 }
 

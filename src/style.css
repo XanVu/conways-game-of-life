@@ -3,7 +3,7 @@ html, * {
   font-family: "Bahnschrift";
 }
 
-table {
+table{
   border: 1px solid #ccc;
   padding: 15px;
   background-color: white;
@@ -56,10 +56,11 @@ h3{
 }
 
 #tabContainer {
-  width: 75%;
+  width: fit-content;
   margin: auto;
   background-color:#673e37;
   color:white;
+  max-width: 40%;
 }
 
 .left, .right {
@@ -167,6 +168,18 @@ h3{
   padding: 22px 20px;
 }
 
+dl{
+  margin: 15px 0px;
+}
+
+dt {
+ font-size: 1.15rem;
+ margin: 15px 0px;
+}
+
+dd{
+  font-size: 1.10rem;
+}
 
 /* Style the tab content */
 .tabContent {
@@ -180,7 +193,7 @@ h3{
 
 p{
   font-size: 1.2rem;
-  padding: 5px;
+  padding: 5px, 0px;
 }
 
 
@@ -198,7 +211,7 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-runnable-track {
   -webkit-appearance: none;
   appearance: none;
-  width: 10px;
+  width: 20px;
   writing-mode: vertical-lr;
   border-radius: 25px;
   background: rgb(246, 114, 128);

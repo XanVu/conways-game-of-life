@@ -89,7 +89,7 @@ class Organism {
       let currentIteration = this.statisticHandler.getIteration()
       let nextIterationValue = currentIteration + 1
 
-      this.statisticHandler.resetStatsPerIteration()
+      
 
       array.forEach((subarray, row) => subarray.forEach((cell, col) => {
             let adjacentCells = this.#getAdjacentCells(row, col)
@@ -97,11 +97,13 @@ class Organism {
             cell.evolving(livingAdjacentCells, nextIterationValue)       
             this.statisticHandler.updateReasonOfDevelopment(cell)
             this.conditionValidator.changingCellExists(cell.getHasChanged())
-          }))      
+          })) 
+
             let repetitionCounter = this.statisticHandler.handleRepetitionCounter()
             let livingCells = this.statisticHandler.getLivingCellsPerIteration()
             this.conditionValidator.validateInternnalLoopingConditions(repetitionCounter, livingCells)
-            this.statisticHandler.saveStatsPerIteration()     
+            this.statisticHandler.saveStatsPerIteration()
+           
     }
 
   #getAdjacentCells(row, col){
@@ -150,7 +152,7 @@ export function recursiveLoop(){
       organism.validateStock()
       table.updateHtmlSpanInTable()
       statisticComponent.loadStatisticTab()
-      
+
       setTimeout(recursiveLoop, organism.getInterval())
     }
         
