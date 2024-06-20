@@ -40,6 +40,7 @@ h1{
 h3{
   font-size: 1.2rem;
   text-decoration: underline;
+  text-align: center;
 }
 
 #settingsContainer{
@@ -60,7 +61,7 @@ h3{
   margin: auto;
   background-color:#673e37;
   color:white;
-  max-width: 40%;
+  max-width: 45%;
 }
 
 .left, .right {
@@ -170,15 +171,18 @@ h3{
 
 dl{
   margin: 15px 0px;
+  text-align: center;
 }
 
 dt {
  font-size: 1.15rem;
  margin: 15px 0px;
+ text-align: center;
 }
 
 dd{
   font-size: 1.10rem;
+  text-align: center;
 }
 
 /* Style the tab content */

@@ -1,5 +1,5 @@
-import organism from "./Organism"
-import { recursiveLoop } from  "./Organism.js";
+import organism from "./TableHandler.js"
+import { recursiveLoop } from  "./TableHandler.js";
 import TableExtentions from "./TableExtensions.js";
 
 let instance
@@ -45,9 +45,9 @@ class ControlsComponent {
 
     startButton.addEventListener("click", function() {
   
-    if(organism.conditionValidator.getIsAlive() && organism.conditionValidator.getIsEvolving() && !organism.conditionValidator.getIsRepeating()){
-         organism.conditionValidator.setHasStarted(true)
-         organism.conditionValidator.setStopped(false)
+    if(organism.conditionHandler.getIsAlive() && organism.conditionHandler.getIsEvolving() && !organism.conditionHandler.getIsRepeatingPattern()){
+         organism.conditionHandler.setStarted(true)
+         organism.conditionHandler.setStopped(false)
          recursiveLoop()
          this.classList.add('isHidden')
          f.#stopButton.classList.remove('isHidden')
@@ -71,7 +71,7 @@ class ControlsComponent {
     let g = this
     
     stopButton.addEventListener('click', function(){
-        organism.conditionValidator.setStopped(true)
+        organism.conditionHandler.setStopped(true)
         this.classList.add('isHidden') 
         g.#startButton.classList.remove('isHidden')
       })

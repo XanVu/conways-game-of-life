@@ -1,6 +1,6 @@
 import navbar from "./NavigationComponent"
 import controls from './ControlsComponent';
-import organism from "./Organism"
+import organism from "./TableHandler"
 
 let instance
 
@@ -16,8 +16,8 @@ class StatisticComponent {
 
   loadStatisticTab(){     
     let tab = navbar.getStatisticTab() 
-    let currentStats = organism.statisticHandler.getCurrentStatistics()  
-    
+    let currentStats = organism.statisticHandler.sendCurrentStatisticsToComponent()  
+
     let statusParagraph = this.#determineStatus()
     let statistics = this.#createNextStatisticsDiv(currentStats)
     
@@ -26,14 +26,15 @@ class StatisticComponent {
     this.#deletePreviousStatisticIfPresent(tab)
     tab.appendChild(statistics)
 
-    organism.statisticHandler.resetStatsPerIteration()
+    organism.statisticHandler.resetCurrentLivingCells()
+           
   }
 
 
   #createNextStatisticsDiv(currentStats){
     let dl = document.createElement('dl')
 
-    let textArray = ['Generation:', 'living Cells:', 'dead Cells:' , 'Death by Overpolulation:', 'Death by Underpopulation:', 'Resurrection by Reproduction']
+    let textArray = ['Generation:', 'overall living Cells:' , 'Death by Overpolulation:', 'Death by Underpopulation:', 'Resurrection by Reproduction']
 
     for(const [index, [_, value]] of Object.entries(Object.entries(currentStats))){
         let formattedValue = this.#formatter.format(value)
@@ -60,7 +61,7 @@ class StatisticComponent {
   let dt = document.createElement('dt')
   let status = "Status: Organism is alive!"
 
-    if(!organism.conditionValidator.getIsAlive()){
+    if(!organism.conditionHandler.getIsAlive()){
       
       let b = controls.getStartButton()
       let b1 = controls.getStopButton()
@@ -71,7 +72,7 @@ class StatisticComponent {
       status = "Status: Organism is dead!"
     }
    
-    if(!organism.conditionValidator.getIsEvolving()){
+    if(!organism.conditionHandler.getIsEvolving()){
 
       let b = controls.getStartButton()
       let b1 = controls.getStopButton()
@@ -82,7 +83,7 @@ class StatisticComponent {
       status = "Status: Stable configuration!"
     }
    
-    if(organism.conditionValidator.getIsRepeating()){
+    if(organism.conditionHandler.getIsRepeatingPattern()){
       
       let b = controls.getStartButton()
       let b1 = controls.getStopButton()

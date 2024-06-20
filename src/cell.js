@@ -1,121 +1,68 @@
-export default class Cell {
-    static #distribiton = 0.75
+export default class Cell { 
+    #evolvedIndicator = 1
+    #vitalStatus
+    #cachedStatus = false
 
-    #currentEvolutionStep = 1
-
-    #isAlive
-
-    #previousState = false
-
-    #isUnderpopulated = false
-    #isOverpopulated = false
-    #isReproducing = false
-    #hasChanged = false
-
- 
-    constructor(isAlive){
-      this.#isAlive = isAlive
+    constructor(vitalStatus){
+      this.#vitalStatus = vitalStatus
     }
 
-    getCurrentEvolutionStep(){
-      return this.#currentEvolutionStep
+    #getEvolvedIndicator(){
+      return this.#evolvedIndicator
     }
     
-    getIsAlive(){
-      return this.#isAlive
+    getVitalStatus(){
+      return this.#vitalStatus
     }  
     
-    getPreviousState(){
-      return this.#previousState
+    #getCachedStatus(){
+      return this.#cachedStatus
     }
 
-    getIsUnderpopulated(){
-      return this.#isUnderpopulated
+    #incrementEvolvedIndicator(){
+      this.#evolvedIndicator += 1
     }
 
-    getIsOverpopulated(){
-      return this.#isOverpopulated
+    #setVitalStatus(vitalStatus){
+      this.#vitalStatus = vitalStatus
     }
 
-    getIsReproducing(){
-      return this.#isReproducing
+    #setCachedStatus(status){
+      this.#cachedStatus = status
     }
 
-    getHasChanged(){
-      return this.#hasChanged
+    isUnderpopulated(adjacentLivingCells){
+      return adjacentLivingCells < 2  
     }
 
-    getPreviousState(){
-      return this.#previousState
+    isOverpopulated(adjacentLivingCells){
+      return adjacentLivingCells > 3
     }
 
-
-    #setIsAlive(bool){
-      this.#isAlive = bool
+    isResurrected(adjacentLivingCells){
+      return adjacentLivingCells == 3
     }
 
-    #setPreviousState(bool){
-      this.#previousState = bool
+    hasSwitchedStatus(){
+      return this.getVitalStatus() != this.#getCachedStatus()
     }
 
-    #setIsUnderpopulated(bool){
-      this.#isUnderpopulated = bool
+    cacheVitalStatusAndEvolveTo(nextVitalStatus){    
+      let currentVitalStatus = this.getVitalStatus()
+      this.#setCachedStatus(currentVitalStatus)
+      this.#setVitalStatus(nextVitalStatus)
+      this.#incrementEvolvedIndicator()
+      return nextVitalStatus
+    }
+    
+    determineInitialVitalStatus(){
+      let initVitalStatus = Math.random() > 0.75
+      this.#setVitalStatus(initVitalStatus)
+      return initVitalStatus
     }
 
-    #setIsOverpopulated(bool){
-      this.#isOverpopulated = bool
-    }
-
-    #setIsReproducing(bool){
-      this.#isReproducing = bool
-    }
-
-    #setHasChanged(bool){
-      this.#hasChanged = bool
-    }
-
-    #setCurrentEvolutionStep(value){
-      this.#currentEvolutionStep = value
-    }
-
-
-    #isNotUnderpopulated(adjacentLivingCells){
-      let isNotUnderpopulated = adjacentLivingCells >= 2  
-      this.#setIsUnderpopulated(!isNotUnderpopulated)
-      return isNotUnderpopulated
-    }
-
-    #isNotOverpopulated(adjacentLivingCells){
-      let isNotOverpopulated = adjacentLivingCells <= 3  
-      this.#setIsOverpopulated(!isNotOverpopulated)
-      return isNotOverpopulated
-    }
-
-    #reproducing(adjacentLivingCells){
-      let currentState = this.getIsAlive()
-      let isReproducing = adjacentLivingCells == 3
-      this.#setIsReproducing(isReproducing)
-      this.#setPreviousState(currentState) 
-      this.#setIsAlive(isReproducing)
-      this.#setHasChanged(isReproducing != currentState)   
-      return isReproducing
-    }
-
-    #isSurviving(adjacentLivingCells){    
-      let currentState = this.getIsAlive()
-      let isSurviving =  this.#isNotUnderpopulated(adjacentLivingCells) && this.#isNotOverpopulated(adjacentLivingCells)
-      this.#setPreviousState(currentState) 
-      this.#setIsAlive(isSurviving)
-      this.#setHasChanged(isSurviving != currentState) 
-    }
-
-    evolving(adjacentLivingCells, evolutionStep){
-      this.getIsAlive() ? this.#isSurviving(adjacentLivingCells) : this.#reproducing(adjacentLivingCells)
-      this.#setCurrentEvolutionStep(evolutionStep)
-    }
-
-    validateProbailityOfComingAlive(){
-      if(Math.random() > Cell.#distribiton)
-         this.#setIsAlive(true)
+    determineVitalStatus(evolvedIndicator){
+     return evolvedIndicator == this.#getEvolvedIndicator() ? 
+       this.getVitalStatus() : this.#getCachedStatus()
     }
   }
