@@ -2,13 +2,13 @@
 import navbar from './NavigationComponent';
 import controls from './ControlsComponent';
 import table from './TableComponent'
-import organism from './Organism';
+import tableHandler from './TableHandler';
 import statisticComponent from './StatisticComponent';
 
 
 navbar.loadingNavBarAndTabs()
 controls.loadingControls()
-organism.initializeTable()
+tableHandler.createTableAndConfig()
 table.initializeTable()
 statisticComponent.loadStatisticTab()
 

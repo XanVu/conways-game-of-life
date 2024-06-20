@@ -1,4 +1,4 @@
-import organism from "./Organism.js";
+import organism from "./TableHandler.js";
 
 let instance
 class TableComponent {
@@ -57,7 +57,7 @@ class TableComponent {
       }
     
       #applyCssClassToSpan(span, cell){
-        if(cell.getIsAlive()){ 
+        if(cell.getVitalStatus()){ 
             span.classList.remove('deadCircle')
             span.classList.add('livingCircle')
           }

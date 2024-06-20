@@ -1,6 +1,6 @@
 import table from './TableComponent';
 import statisticComponent from './StatisticComponent';
-import organism from './Organism';
+import organism from './TableHandler';
 
 
 export default class TableExtentions {

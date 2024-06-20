@@ -2,176 +2,159 @@
 let instance
 
 export default class StatisticHandler {
-    static repetitionThreshold = 5
-    #rowDimensions
-    #columnDimensions
-    #repetitionCounter
-    #iteration
-    #livingCellsPerIteration
+    #generation
+    #currentLivingCells
+    #overallLivingCells
     #fatalitiesOfOverpopulation
     #fatalitiesOfUnderpopulation
-    #reproducedCells
-    #previousLivingCellsPerIteration
+    #resurrectedCells
+    #cachedLivingCells
 
-    constructor(rowLength, colLength){
+    constructor(){
       if (instance)
         throw new Error("Singleton")
       
-      this.#rowDimensions = rowLength
-      this.#columnDimensions = colLength
-
       this.initToDefault()
 
       instance = this;
     }
 
-    initToDefault(){
-      this.#repetitionCounter = 0
-      this.#iteration = 1
-      this.#livingCellsPerIteration = 0
-      this.#fatalitiesOfOverpopulation = 0
-      this.#fatalitiesOfUnderpopulation = 0
-      this.#reproducedCells = 0
-      this.#previousLivingCellsPerIteration = 0
-    }
-
-    getCurrentStatistics(){
-      const data = {
-        iteration: this.getIteration(),
-        livingCellsPerIteration:  this.getLivingCellsPerIteration(),
-        deadCellsPerIteration: this.calculateDeadCells(),
-        fatalitiesOfOverpopulation: this.getFatalitiesOfOverpopulation(),
-        fatalitiesOfUnderpopulation: this.getFatalitiesOfUnderpopulation(),
-        reproducedCells: this.getReproducedCells(),
-      }
-      return data
-    }
-
-    getRowDimensions(){
-      return this.#rowDimensions
-    }
-
-    getColumnDimensions(){
-      return this.#columnDimensions
-    }
-
-    getRepetitionCounter(){
-      return this.#repetitionCounter
-  }
-
-    getIteration(){
-        return this.#iteration
+    getGeneration(){
+        return this.#generation
     }
   
-    getLivingCellsPerIteration(){
-      return this.#livingCellsPerIteration
+    getCurrentLivingCells(){
+      return this.#currentLivingCells
     }
 
-      getFatalitiesOfOverpopulation(){
+    #getOverallLivingCells(){
+      return this.#overallLivingCells
+    }
+
+      #getFatalitiesOfOverpopulation(){
         return this.#fatalitiesOfOverpopulation
       }
   
-      getFatalitiesOfUnderpopulation(){
+      #getFatalitiesOfUnderpopulation(){
         return this.#fatalitiesOfUnderpopulation
       }
   
-      getReproducedCells(){
-        return this.#reproducedCells
+      #getResurrectedCells(){
+        return this.#resurrectedCells
       }
 
-      getPreviousLivingCellsPerIteration(){
-        return this.#previousLivingCellsPerIteration
-      }
-  
-      setPreviousLivingCellsPerIteration(pervious){
-        this.#previousLivingCellsPerIteration = pervious
+      #getCachedLivingCells(){
+        return this.#cachedLivingCells
       }
 
-      setRowDimension(value){
-        this.#rowDimensions = value
+      #setLivingCells(value){
+        this.#currentLivingCells = value
       }
 
-      setColumnDimension(value){
-        this.#columnDimensions = value
-      } 
+      #accumulateOverallLivingCells(value){
+        this.#overallLivingCells += value
+      }
 
-      
+      setCachedLivingCells(pervious){
+        this.#cachedLivingCells = pervious
+      }
 
-
-    resetRepetitionCounter(){
-        this.#repetitionCounter = 0
+    #incrementGeneration(){
+      ++this.#generation
     }
 
-    incrementRepetitionCounter(){
-        ++this.#repetitionCounter
-    }
-
-    #incrementIteration(){
-      ++this.#iteration
-    }
-
-      incrementFatalitiesOfUnderpopulation(){
-        ++this.#fatalitiesOfUnderpopulation
+      #setFatalitiesOfUnderpopulation(value){
+        this.#fatalitiesOfUnderpopulation = value
       }
 
-      incrementLivingCellsPerIteration(){
-        ++this.#livingCellsPerIteration
+      #setFatalitiesOfOverpopulation(value){
+        this.#fatalitiesOfOverpopulation = value
       }
 
-      incrementFatalitiesOfUnderpopulation(){
-        ++this.#fatalitiesOfUnderpopulation
+      #setResurrectedCells(value){
+        this.#resurrectedCells = value
       }
 
-      incrementFatalitiesOfOverpopulation(){
-        ++this.#fatalitiesOfOverpopulation
+      resetCurrentLivingCells(){
+        this.#currentLivingCells = 0
       }
 
-      incrementReproducedCells(){
-        ++this.#reproducedCells
+      #cacheCurrentLivingCells(){
+        let currentLivingCells = this.getCurrentLivingCells()
+        this.setCachedLivingCells(currentLivingCells)
       }
 
-      resetStatsPerIteration(){
-        this.#livingCellsPerIteration = 0
-      }
-      
-      incrementStatsPerIterationForCell(isCellAlive){
-        if(isCellAlive)
-           this.incrementLivingCellsPerIteration()
-      }
-
-      updateReasonOfDevelopment(cell){
-        if(cell.getIsOverpopulated())
-          this.incrementFatalitiesOfOverpopulation()
-    
-        if(cell.getIsUnderpopulated())
-          this.incrementFatalitiesOfUnderpopulation()  
-    
-        if(cell.getIsReproducing())
-          this.incrementReproducedCells()
-        
-        if(cell.getIsAlive())
-          this.incrementLivingCellsPerIteration()
-      }
-
-      saveAndResetStatsPerIteration(){
-        this.saveStatsPerIteration()
-        this.resetStatsPerIteration()
-      }
-    
-      saveStatsPerIteration(){
-        let currentLivingCells = this.getLivingCellsPerIteration()
-        this.setPreviousLivingCellsPerIteration(currentLivingCells)
-        this.#incrementIteration()
-      }
-
-      handleRepetitionCounter(){
-        let currentLivingCells = this.getLivingCellsPerIteration()
-        let previousLivingCells = this.getPreviousLivingCellsPerIteration()
-        previousLivingCells == currentLivingCells ? this.incrementRepetitionCounter() : this.resetRepetitionCounter()
-        return this.getRepetitionCounter()
+      #compareLivingCellsForRepetition(){
+        let currentLivingCells = this.getCurrentLivingCells()
+        let previousLivingCells = this.#getCachedLivingCells()
+        return previousLivingCells == currentLivingCells
       }      
 
-      calculateDeadCells(){
-       return (this.getRowDimensions() * this.getColumnDimensions()) - this.getLivingCellsPerIteration()
+      initToDefault(){
+        this.#generation = 0
+        this.#currentLivingCells = 0
+        this.#overallLivingCells = 0
+        this.#fatalitiesOfOverpopulation = 0
+        this.#fatalitiesOfUnderpopulation = 0
+        this.#resurrectedCells = 0
+        this.#cachedLivingCells = 0
       }
-}
+  
+      sendCurrentStatisticsToComponent(){
+        let dataStructureForComponent = {
+          generation: this.getGeneration(),
+          overallLivingCells: this.#getOverallLivingCells(),
+          fatalitiesOfOverpopulation: this.#getFatalitiesOfOverpopulation(),
+          fatalitiesOfUnderpopulation: this.#getFatalitiesOfUnderpopulation(),
+          resurrectedCells: this.#getResurrectedCells(),
+        }
+        return dataStructureForComponent
+      }
+
+      #setStaticalDataFromTableHandler(acc){
+        let currentLivingCells = acc.currentLivingCells
+        this.#setLivingCells(currentLivingCells)
+        this.#setFatalitiesOfOverpopulation(acc.deathsByOverpopulation)
+        this.#setFatalitiesOfUnderpopulation(acc.deathsByUnderpopulation)
+        this.#setResurrectedCells(acc.resurrectedCells)
+        this.#accumulateOverallLivingCells(currentLivingCells)
+        this.#incrementGeneration()
+      }
+
+      getAccumulator(){
+        let accumulators = {
+          currentLivingCells: this.getCurrentLivingCells(),
+          deathsByOverpopulation: this.#getFatalitiesOfOverpopulation(),
+          deathsByUnderpopulation: this.#getFatalitiesOfUnderpopulation(),
+          resurrectedCells: this.#getResurrectedCells(),
+
+          incrementLivingCells(){
+            this.currentLivingCells += 1
+          },
+
+          incrementDeathsByOverpopulation(){
+            this.deathsByOverpopulation += 1
+          },
+
+          incrementDeathsByUnderpopulation(){
+            this.deathsByUnderpopulation += 1
+          },
+
+          incrementRessurectedCells(){
+            this.resurrectedCells += 1
+          }
+        }
+        return accumulators
+      }
+
+      processDataAndComputeCondition(acc){
+        this.#setStaticalDataFromTableHandler(acc)
+        return this.#validateRepetitionAndCache()
+      }
+
+      #validateRepetitionAndCache(){
+         let isRepeating = this.#compareLivingCellsForRepetition()
+        this.#cacheCurrentLivingCells()
+        return isRepeating
+      }
+    }
