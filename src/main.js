@@ -3,12 +3,14 @@ import navbar from './NavigationComponent';
 import controls from './ControlsComponent';
 import table from './TableComponent'
 import tableHandler from './TableHandler';
-import statisticComponent from './StatisticComponent';
+import tabs from './TabComponent';
+import slider from './SliderComponent';
 
-
-navbar.loadingNavBarAndTabs()
+navbar.loadingNavBar()
+tabs.loadingTabs()
 controls.loadingControls()
-tableHandler.createTableAndConfig()
-table.initializeTable()
-statisticComponent.loadStatisticTab()
+slider.loadingSlider()
+
+tableHandler.createTableAndConfig(table.addRow.bind(table), table.addCell.bind(table))
+tabs.refreshStatisticTab()
 

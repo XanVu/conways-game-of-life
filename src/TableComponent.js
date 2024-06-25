@@ -1,72 +1,53 @@
+import StyleManager from "./StyleManager.js";
 import organism from "./TableHandler.js";
 
 let instance
 class TableComponent {
   interval = 0
-  organism
   #table
 
   constructor(){
     if (instance)
       throw new Error("Singleton")
     
-    instance = this 
-    
-    this.organism = organism
+    instance = this
     this.#table = document.querySelector("table")
    }
 
-  getTable(){
+  #getTable(){
     return this.#table
   }
 
-
     deleteTableAndResetData(){
-      organism.resetOrganism()
-      let table = this.getTable()
+      let table = this.#getTable()
       Array.from(table.rows).forEach(row => row.remove())
-
-      this.initializeTable()
-
-    }
-
-
-    initializeTable(){
-        let internalTable = organism.getTable()
-        let table = this.getTable()
-        
-        internalTable.forEach( subArray => {
-          let r = table.insertRow()
-          subArray.forEach(cell => {
-            let c = r.insertCell()
-            let span = document.createElement("span")             
-            c.appendChild(span)
-            this.#applyCssClassToSpan(span, cell)
-          })
-        })
+      organism.resetOrganism(this.addRow.bind(this), this.addCell.bind(this))
     }
     
-      updateHtmlSpanInTable(){
-        let internalTable = organism.getTable()
-        let table = this.getTable()
-        internalTable.forEach((subArray, row) => subArray.forEach((cell, col) => {
-          let representationTableCell = table.rows[row].cells[col]
-          let span = representationTableCell.firstChild
-          this.#applyCssClassToSpan(span, cell)
-        }))
+      addRow(){
+        let table = this.#getTable()
+        let row = table.insertRow()
+        return row
       }
-    
-      #applyCssClassToSpan(span, cell){
-        if(cell.getVitalStatus()){ 
-            span.classList.remove('deadCircle')
-            span.classList.add('livingCircle')
-          }
-          else{
-            span.classList.remove('livingCircle')
-            span.classList.add('deadCircle')
-          }
-    }
+
+      addCell(row, vitalStatus){
+        let cell = row.insertCell()
+        this.#createCellSpan(cell, vitalStatus)
+      }
+
+      #createCellSpan(cell, vitalStatus){
+        let span = document.createElement("span")             
+        cell.appendChild(span)
+        StyleManager.styleCell(span, vitalStatus)
+      }
+
+      refreshCell(row, col, vitalStatus){
+        var table = this.#getTable()
+        let cell = table.rows.item(row).cells.item(col)
+        let span = cell.firstChild
+        StyleManager.styleCell(span, vitalStatus)
+      }
 }
 
-let table = Object.freeze(new TableComponent());
-export default table;
+let tableComp = Object.freeze(new TableComponent());
+export default tableComp;
