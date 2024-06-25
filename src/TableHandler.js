@@ -1,8 +1,8 @@
 import StatisticHandler from "./StatisticHandler.js";
 import Cell from "./Cell.js";
 import ConditionHandler from "./ConditionHandler.js";
-import table from "./TableComponent.js";
-import statisticComponent from "./StatisticComponent.js";
+import tableComp from "./TableComponent.js";
+import tabs from "./TabComponent.js";
 
 let instance
 
@@ -75,11 +75,11 @@ class TableHandler {
       this.#repetitionCounter = 0
     }
 
-    resetOrganism(){
+    resetOrganism(rowHook, columnHook){
       this.setTable(null)
       this.statisticHandler.initToDefault()
       this.conditionHandler.initToDefault()
-      this.createTableAndConfig()
+      this.createTableAndConfig(rowHook, columnHook)
     }
 
     #buildTable(){
@@ -90,18 +90,21 @@ class TableHandler {
         return table
     }
 
-    createTableAndConfig(){
+    createTableAndConfig(rowHook, columnHook){
       let table = this.#buildTable() 
       let acc = this.statisticHandler.getAccumulator()
     
       table.forEach(subarray => {
+        let row = rowHook()  
         subarray.forEach(cell => {
-        cell.determineInitialVitalStatus()
+        let vitalStatus = cell.determineInitialVitalStatus()
         if(cell.getVitalStatus())
           ++acc.currentLivingCells
-      })})
 
-        this.statisticHandler.processDataAndComputeCondition(acc)
+
+        columnHook(row, vitalStatus)
+      })})
+      this.statisticHandler.processDataAndComputeCondition(acc)
     }
 
     validateStock(){
@@ -111,10 +114,14 @@ class TableHandler {
       array.forEach((subarray, row) => subarray.forEach((cell, col) => {
             let adjacentCells = this.#getAdjacentCells(row, col)
             let livingAdjacentCells = this.#calculateNumberOfLivingAdjacentCells(adjacentCells)
-            this.#validateEvolution(acc, cell, livingAdjacentCells)
+            let vitalStatus = this.#validateEvolution(acc, cell, livingAdjacentCells)
             this.#accumulatedLivingCellsAfterEvolving(acc, cell)
             this.#validateChangeBehavior(cell)
+
+            tableComp.refreshCell(row, col, vitalStatus)
+
           }))  
+
       
             this.#validateTableRelatedConditions(acc)
     }
@@ -236,10 +243,8 @@ export default tableHandler;
 export function recursiveLoop(){
 
     if(tableHandler.isOrganismStillEvolving()){
-
       tableHandler.validateStock()
-      table.updateHtmlSpanInTable()
-      statisticComponent.loadStatisticTab()
+      tabs.refreshStatisticTab()
 
       setTimeout(recursiveLoop, tableHandler.getInterval())
     } 

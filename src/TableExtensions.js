@@ -1,4 +1,4 @@
-import table from './TableComponent';
+import tableComp from './TableComponent';
 import statisticComponent from './StatisticComponent';
 import organism from './TableHandler';
 
@@ -6,8 +6,8 @@ import organism from './TableHandler';
 export default class TableExtentions {
     
     static resetTable(){
-    table.deleteTableAndResetData()
-    statisticComponent.loadStatisticTab()
+    tableComp.deleteTableAndResetData()
+    statisticComponent.createStatPresentation()
     }
 
     static reloadTable(){

@@ -56,6 +56,7 @@ export default class ConditionHandler {
   
     setStarted(){
         this.#started = true
+        this.setStopped(false)
     }
   
     setStopped(bool){

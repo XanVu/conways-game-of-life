@@ -1,175 +1,112 @@
 import organism from "./TableHandler.js"
 import { recursiveLoop } from  "./TableHandler.js";
 import TableExtentions from "./TableExtensions.js";
+import StyleManager from "./StyleManager.js";
+import * as constants from './Constants';
+import tabs from "./TabComponent.js";
 
 let instance
-class ControlsComponent {
-    #controlsContainer
-    #settingsContainer
+class ControlsComponent {    
     #startButton
     #stopButton
-    #wrapper
 
   constructor(){
     if (instance)
-      throw new Error("Singleton")
-    
-    instance = this 
-
-    this.#controlsContainer = document.getElementById('controlsContainer')
-    this.#settingsContainer = document.getElementById('settingsContainer')
-    this.#wrapper = document.getElementById('wrapper')
+      throw new Error("Singleton")  
+    instance = this
   }
 
-  getStartButton(){
+  #getStartButton(){
     return this.#startButton
   }
 
-  getStopButton(){
+  #getStopButton(){
     return this.#stopButton
   }
 
-
-  #registerPlayButton(){
-    let startButton = document.createElement('button')
-
-    let icon = document.createElement('i')
-
-    let iconClassList = ['fa','fa-play-circle-o','fa-3x']
-    icon.classList.add(...iconClassList)
-    startButton.appendChild(icon)
-
-    this.#startButton = startButton
-
-    let f = this
-
-    startButton.addEventListener("click", function() {
-  
-    if(organism.conditionHandler.getIsAlive() && organism.conditionHandler.getIsEvolving() && !organism.conditionHandler.getIsRepeatingPattern()){
-         organism.conditionHandler.setStarted(true)
-         organism.conditionHandler.setStopped(false)
-         recursiveLoop()
-         this.classList.add('isHidden')
-         f.#stopButton.classList.remove('isHidden')
-    }})
-    this.#controlsContainer.appendChild(startButton)
-  }
-
-  #registerStopButton(){
-    let stopButton = document.createElement('button')
-    this.#stopButton = stopButton
-
-    stopButton.classList.add('isHidden')
-
-    let icon = document.createElement('i')
-
-    let iconClassList = ['fa','fa-pause-circle-o','fa-3x']
-
-    icon.classList.add(...iconClassList)
-    stopButton.appendChild(icon)
-
-    let g = this
+  #createButton(iconShape, isHidden = false){
+    let parentNode = document.getElementById('controlsContainer')  
+    let button = document.createElement('button') 
     
-    stopButton.addEventListener('click', function(){
-        organism.conditionHandler.setStopped(true)
-        this.classList.add('isHidden') 
-        g.#startButton.classList.remove('isHidden')
-      })
-
-    this.#controlsContainer.appendChild(stopButton)
-  }
-
-  #registerResetButton(){
-    let resetButton = document.createElement('button')
-
+    let controllCssClass = 'controls'
+    button.classList.add(controllCssClass)
+    
+    if(isHidden)
+      StyleManager.hideElement(button)
+    
     let icon = document.createElement('i')
+    icon.classList.add(...constants.iconAssets, iconShape)
 
-    let iconClassList = ['fa', 'fa-refresh', 'fa-3x']
-
-    icon.classList.add(...iconClassList)
-    resetButton.appendChild(icon)
-
-    let f = this
-
-    resetButton.addEventListener('click', () => {
-         TableExtentions.resetTable()
-        f.#startButton.classList.remove('isHidden')
-        f.#stopButton.classList.add('isHidden')
-      })
-
-      this.#controlsContainer.appendChild(resetButton)
-  }
-
-  #registerSettingsButton(){
-    let settingButton = document.createElement('button')
-
-    let wrap = this.#wrapper
-
-    let icon = document.createElement('i')
-
-    let iconClassList = ['fa','fa-cog','fa-3x']
-
-    icon.classList.add(...iconClassList)
-    settingButton.appendChild(icon)
-
-
-    settingButton.addEventListener('click', function(){
-        if(wrap.classList.contains('isHidden'))
-          wrap.classList.remove('isHidden')
-        else
-        wrap.classList.add('isHidden')
-    })
-
-    this.#controlsContainer.appendChild(settingButton)
-  }
-
-  #applyCssClassToControls(){
-    let con = this.#controlsContainer
-
-    for(var i = 0; i < con.children.length; ++i){
-      let control = con.children[i]
-      control.classList.add('controls')
-    }
+    button.appendChild(icon)
+    parentNode.appendChild(button)
+    return button
   } 
 
-  #registerSettingsTab(){
-    let settingsTab = document.getElementById('settingsContainer')
-    settingsTab.classList.add('isHidden')
-
-    let label = document.createElement('label')
-    label.textContent = "Interval Speed between Evolution"
-
-    //settingsTab.appendChild(label)
+  loadingControls(){
+    let isHidden = true
+    let startButton = this.#createButton(constants.playIcon)
+    let stopButton =  this.#createButton(constants.stopIcon, isHidden)
+    let resetButton = this.#createButton(constants.resetIcon)
+    let settingButton = this.#createButton(constants.settingIcon)
     
-    let slider = document.getElementById('sliderInput')
-    let sliderDiv = document.getElementById('slider')
+    this.#startButton = startButton
+    this.#stopButton = stopButton
 
-    let intervals = ['FAST', 'MEDIUM', 'SLOW']
-  
-    for (var i = 0; i < intervals.length; i++) {
-      let span = document.createElement('span')
-      span.textContent = intervals[i]
-      sliderDiv.append(span);
+    startButton.addEventListener(constants.click, this.#startEvolvingProcess.bind(this))
+    stopButton.addEventListener(constants.click, this.#stopEvolvingProcess.bind(this))
+    resetButton.addEventListener(constants.click, this.#resetEvolvingProcess.bind(this))
+    settingButton.addEventListener(constants.click, this.#toggleSettingsTab)
+  }
+
+  #toggleSettingsTab(){
+    let settingsWrapper = document.getElementById('settingsWrapper')
+    StyleManager.toggleElementsVisibilty(settingsWrapper)
+  }
+
+  #toggleStartStop(){
+    let start = this.#getStartButton()
+    let stop = this.#getStopButton()
+
+    if(StyleManager.isHidden(start)){
+      StyleManager.hideElement(stop)
+      StyleManager.showElement(start)
     }
+    else{
+      StyleManager.hideElement(start)
+      StyleManager.showElement(stop)
+    }
+  }
 
-    settingsTab.appendChild(slider)   
-    settingsTab.appendChild(sliderDiv)
-
-    slider.addEventListener('input',() => {
-      organism.setInterval(slider.value)
-    })
+  hideStartAndStop(){
+    let start = this.#getStartButton()
+    let stop = this.#getStopButton()
+    StyleManager.hideElement(start)
+    StyleManager.hideElement(stop)
   }
 
 
-  loadingControls(){
-    this.#registerPlayButton()
-    this.#registerStopButton()
-    this.#registerResetButton()
-    this.#registerSettingsButton()
-    this.#applyCssClassToControls()
-    this.#registerSettingsTab()
+  #startEvolvingProcess(){
+    if(organism.conditionHandler.getIsAlive() && organism.conditionHandler.getIsEvolving() && !organism.conditionHandler.getIsRepeatingPattern()){
+         organism.conditionHandler.setStarted(true)
+         recursiveLoop()
+         this.#toggleStartStop()
+    }
+  }
+
+  #stopEvolvingProcess(){   
+        organism.conditionHandler.setStopped(true)
+        this.#toggleStartStop()
+  }
+
+  #resetEvolvingProcess(){
+        TableExtentions.resetTable()
+        let start = this.#getStartButton()
+        if(StyleManager.isHidden(start))
+          this.#toggleStartStop()
+        tabs.refreshStatisticTab()
   }
 }
 
 let controls = Object.freeze(new ControlsComponent())
 export default controls
+ 

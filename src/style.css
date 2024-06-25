@@ -56,7 +56,7 @@ h3{
   padding: 5px;
 }
 
-#tabContainer {
+#tabsContainer {
   width: fit-content;
   margin: auto;
   background-color:#673e37;
@@ -95,7 +95,7 @@ h3{
   align-items: center;
 }
 
-#slider{
+.slider{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -169,22 +169,6 @@ h3{
   padding: 22px 20px;
 }
 
-dl{
-  margin: 15px 0px;
-  text-align: center;
-}
-
-dt {
- font-size: 1.15rem;
- margin: 15px 0px;
- text-align: center;
-}
-
-dd{
-  font-size: 1.10rem;
-  text-align: center;
-}
-
 /* Style the tab content */
 .tabContent {
   padding: 6px 12px;
@@ -242,6 +226,51 @@ input[type=range]::-webkit-slider-thumb {
   width: 20px;
   writing-mode: vertical-lr;
   box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.90);
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #6d031c;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  bottom: 105%;
+  left: 50%;
+  margin-left: auto;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Tooltip arrow */
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #6d031c transparent transparent transparent;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }
 
 
