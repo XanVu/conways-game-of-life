@@ -107,24 +107,23 @@ class TableHandler {
       this.statisticHandler.processDataAndComputeCondition(acc)
     }
 
-    validateStock(){
+    refreshTable(){ 
       let array = this.getTable()
       let acc = this.statisticHandler.getAccumulator()
-      
-      array.forEach((subarray, row) => subarray.forEach((cell, col) => {
+
+      if(this.isOrganismStillEvolving()){
+        array.forEach((subarray, row) => subarray.forEach((cell, col) => {
             let adjacentCells = this.#getAdjacentCells(row, col)
             let livingAdjacentCells = this.#calculateNumberOfLivingAdjacentCells(adjacentCells)
             let vitalStatus = this.#validateEvolution(acc, cell, livingAdjacentCells)
             this.#accumulatedLivingCellsAfterEvolving(acc, cell)
             this.#validateChangeBehavior(cell)
-
             tableComp.refreshCell(row, col, vitalStatus)
-
-          }))  
-
-      
+          })) 
             this.#validateTableRelatedConditions(acc)
-    }
+            tabs.refreshStatisticTab() 
+          }
+  }
 
     #validateEvolution(acc, cell, livingAdjacentCells){ 
       let evolvedVitalStatus
@@ -177,9 +176,6 @@ class TableHandler {
   
     #validateTableRelatedConditions(acc){
     let isRepeating = this.statisticHandler.processDataAndComputeCondition(acc)
-
-    
-
     let currentLivingCells = this.statisticHandler.getCurrentLivingCells()
 
     isRepeating ? this.#incrementRepetitionCounter() : this.#resetRepetitionCounter()
@@ -235,17 +231,12 @@ class TableHandler {
     isOrganismStillEvolving(){
      return this.conditionHandler.isEvolving()
     }
- }
+
+    evolving(){
+        this.refreshTable()
+        setTimeout(this.evolving.bind(this), this.getInterval())
+   }
+}
 
 let tableHandler = Object.freeze(new TableHandler());
 export default tableHandler;
-
-export function recursiveLoop(){
-
-    if(tableHandler.isOrganismStillEvolving()){
-      tableHandler.validateStock()
-      tabs.refreshStatisticTab()
-
-      setTimeout(recursiveLoop, tableHandler.getInterval())
-    } 
-}

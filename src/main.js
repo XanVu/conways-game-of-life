@@ -6,11 +6,13 @@ import tableHandler from './TableHandler';
 import tabs from './TabComponent';
 import slider from './SliderComponent';
 
-navbar.loadingNavBar()
-tabs.loadingTabs()
-controls.loadingControls()
-slider.loadingSlider()
+loadApp()
 
-tableHandler.createTableAndConfig(table.addRow.bind(table), table.addCell.bind(table))
-tabs.refreshStatisticTab()
-
+ function loadApp(){
+    navbar.loadingNavBar()
+    tabs.loadingTabs()
+    controls.loadingControls()
+    slider.loadingSlider()
+    tableHandler.createTableAndConfig(table.addRow.bind(table), table.addCell.bind(table))
+    tabs.refreshStatisticTab()
+ }
