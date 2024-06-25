@@ -88,7 +88,7 @@ class ControlsComponent {
   #startEvolvingProcess(){
     if(organism.conditionHandler.getIsAlive() && organism.conditionHandler.getIsEvolving() && !organism.conditionHandler.getIsRepeatingPattern()){
          organism.conditionHandler.setStarted(true)
-         recursiveLoop()
+         organism.evolving()
          this.#toggleStartStop()
     }
   }
