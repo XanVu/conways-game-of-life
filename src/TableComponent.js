@@ -1,36 +1,54 @@
 import StyleManager from "./StyleManager.js";
-import organism from "./TableHandler.js";
+import statisticComponent from "./StatisticComponent.js";
+import TableHandler from "./TableHandler.js";
+import slider from "./SliderComponent.js";
 
 let instance
 class TableComponent {
   interval = 0
   #table
+  #tableHandler
 
   constructor(){
     if (instance)
       throw new Error("Singleton")
-    
-    instance = this
+    this.#tableHandler = new TableHandler()
+    instance = this 
     this.#table = document.querySelector("table")
+   
    }
 
   #getTable(){
     return this.#table
   }
 
+  #getTableHandler(){
+    return this.#tableHandler
+  }
+
+  #setTableHandler(handler){
+    this.#tableHandler = handler
+  }
+
+  setInterval(value){
+    let table = this.#getTableHandler()
+    table.setInterval(value)
+  }
+
     deleteTableAndResetData(){
       let table = this.#getTable()
       Array.from(table.rows).forEach(row => row.remove())
-      organism.resetOrganism(this.addRow.bind(this), this.addCell.bind(this))
+      this.#setTableHandler(new TableHandler())
+      this.initTable()  
     }
     
-      addRow(){
+      #addRow(){
         let table = this.#getTable()
         let row = table.insertRow()
         return row
       }
 
-      addCell(row, vitalStatus){
+      #addCell(row, vitalStatus){
         let cell = row.insertCell()
         this.#createCellSpan(cell, vitalStatus)
       }
@@ -46,6 +64,44 @@ class TableComponent {
         let cell = table.rows.item(row).cells.item(col)
         let span = cell.firstChild
         StyleManager.styleCell(span, vitalStatus)
+      }
+
+      resetTable(){
+        this.stop()
+        this.deleteTableAndResetData()
+        statisticComponent.createStatPresentation()
+      }
+
+      initTable(){
+        let table = this.#getTableHandler()
+        table.createTableAndConfig(this.#addRow.bind(this), this.#addCell.bind(this))
+        this.setInterval(slider.getCurrentSliderValue())
+      }
+
+      sentStatisticalData(){
+        let table = this.#getTableHandler()
+        return table.statisticHandler.sendCurrentStatisticsToComponent()
+      } 
+
+      sentConditionFlags(){
+        let table = this.#getTableHandler()
+        return table.conditionHandler.getConditionFlags()
+      }
+
+      resetLoopStatistic(){
+        let table = this.#getTableHandler()
+        table.statisticHandler.resetCurrentLivingCells()
+      }
+
+      evolving(){
+        let table = this.#getTableHandler()
+        table.conditionHandler.setStarted(true)
+        table.evolving()
+      }
+
+      stop(){
+        let table = this.#getTableHandler()
+        table.conditionHandler.setStarted(false)
       }
 }
 

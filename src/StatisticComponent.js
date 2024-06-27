@@ -1,6 +1,5 @@
 import controls from './ControlsComponent';
-import organism from "./TableHandler"
-import tabs from "./TabComponent";
+import tableComp from './TableComponent';
 
 let instance
 
@@ -15,9 +14,9 @@ class StatisticComponent {
   }
 
   createStatPresentation(){     
-    let currentStats = organism.statisticHandler.sendCurrentStatisticsToComponent()  
+    let currentStats = tableComp.sentStatisticalData()  
     let statistics = this.#createNextStatisticsText(currentStats)
-    organism.statisticHandler.resetCurrentLivingCells()
+    tableComp.resetLoopStatistic()
     return statistics
   }
 
@@ -44,17 +43,20 @@ class StatisticComponent {
  #determineStatus(){
   let status = "Status: Organism is alive!"
 
-    if(!organism.conditionHandler.getIsAlive()){
+  let conditionFlags = tableComp.sentConditionFlags()
+
+
+    if(!conditionFlags.isAlive){
       controls.hideStartAndStop()      
       status = "Status: Organism is dead!"
     }
    
-    if(!organism.conditionHandler.getIsEvolving()){
+    if(!conditionFlags.isEvolving){
       controls.hideStartAndStop()
       status = "Status: Stable configuration!"
     }
    
-    if(organism.conditionHandler.getIsRepeatingPattern()){
+    if(conditionFlags.isRepeatingPattern){
       controls.hideStartAndStop()
       status = "Status: Stable repeating pattern!"
     }
