@@ -1,14 +1,13 @@
-import organism from "./TableHandler.js"
-import { recursiveLoop } from  "./TableHandler.js";
-import TableExtentions from "./TableExtensions.js";
 import StyleManager from "./StyleManager.js";
 import * as constants from './Constants';
 import tabs from "./TabComponent.js";
+import tableComp from "./TableComponent.js";
 
 let instance
 class ControlsComponent {    
     #startButton
     #stopButton
+    #resetButton
 
   constructor(){
     if (instance)
@@ -51,6 +50,7 @@ class ControlsComponent {
     
     this.#startButton = startButton
     this.#stopButton = stopButton
+    this.#resetButton = resetButton
 
     startButton.addEventListener(constants.click, this.#startEvolvingProcess.bind(this))
     stopButton.addEventListener(constants.click, this.#stopEvolvingProcess.bind(this))
@@ -86,23 +86,26 @@ class ControlsComponent {
 
 
   #startEvolvingProcess(){
-    if(organism.conditionHandler.getIsAlive() && organism.conditionHandler.getIsEvolving() && !organism.conditionHandler.getIsRepeatingPattern()){
-         organism.conditionHandler.setStarted(true)
-         organism.evolving()
+    let conditionFlags = tableComp.sentConditionFlags()
+
+    if(conditionFlags.isAlive && conditionFlags.isEvolving && !conditionFlags.isRepeatingPattern){
+      tableComp.evolving()
          this.#toggleStartStop()
     }
   }
 
   #stopEvolvingProcess(){   
-        organism.conditionHandler.setStopped(true)
+        tableComp.stop()
         this.#toggleStartStop()
   }
 
   #resetEvolvingProcess(){
-        TableExtentions.resetTable()
+        tableComp.stop()
+        tableComp.resetTable()
         let start = this.#getStartButton()
         if(StyleManager.isHidden(start))
           this.#toggleStartStop()
+
         tabs.refreshStatisticTab()
   }
 }

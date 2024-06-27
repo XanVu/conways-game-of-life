@@ -1,22 +1,14 @@
 
-let instance
-
 export default class StatisticHandler {
-    #generation
-    #currentLivingCells
-    #overallLivingCells
-    #fatalitiesOfOverpopulation
-    #fatalitiesOfUnderpopulation
-    #resurrectedCells
-    #cachedLivingCells
+    #generation = 0
+    #currentLivingCells = 0
+    #overallLivingCells = 0
+    #fatalitiesOfOverpopulation = 0
+    #fatalitiesOfUnderpopulation = 0
+    #resurrectedCells = 0
+    #cachedLivingCells = 0 
 
     constructor(){
-      if (instance)
-        throw new Error("Singleton")
-      
-      this.initToDefault()
-
-      instance = this;
     }
 
     getGeneration(){
@@ -89,16 +81,6 @@ export default class StatisticHandler {
         let previousLivingCells = this.#getCachedLivingCells()
         return previousLivingCells == currentLivingCells
       }      
-
-      initToDefault(){
-        this.#generation = 0
-        this.#currentLivingCells = 0
-        this.#overallLivingCells = 0
-        this.#fatalitiesOfOverpopulation = 0
-        this.#fatalitiesOfUnderpopulation = 0
-        this.#resurrectedCells = 0
-        this.#cachedLivingCells = 0
-      }
   
       sendCurrentStatisticsToComponent(){
         let dataStructureForComponent = {
@@ -157,4 +139,4 @@ export default class StatisticHandler {
         this.#cacheCurrentLivingCells()
         return isRepeating
       }
-    }
+}

@@ -4,13 +4,11 @@ import ConditionHandler from "./ConditionHandler.js";
 import tableComp from "./TableComponent.js";
 import tabs from "./TabComponent.js";
 
-let instance
-
-class TableHandler {
+export default class TableHandler {
     #rowDepth = 45
     #columDepth = 45
     #table   
-    #interval = 0
+    #interval
     #repetitionCounter = 0
     #repetitionThreshold = 5
     conditionHandler
@@ -19,12 +17,10 @@ class TableHandler {
     constructor(){
       this.statisticHandler = new StatisticHandler()
       this.conditionHandler = new ConditionHandler()
-      
-      if (instance)
-        throw new Error("Singleton")
-      
-      instance = this
     }
+
+  //#region GetterSetter
+
 
     getTable(){
       return this.#table
@@ -67,6 +63,9 @@ class TableHandler {
       this.#interval = interval
     }
 
+    //#endregion
+
+
     #incrementRepetitionCounter(){
       this.#repetitionCounter += 1
     }
@@ -75,36 +74,12 @@ class TableHandler {
       this.#repetitionCounter = 0
     }
 
-    resetOrganism(rowHook, columnHook){
-      this.setTable(null)
-      this.statisticHandler.initToDefault()
-      this.conditionHandler.initToDefault()
-      this.createTableAndConfig(rowHook, columnHook)
-    }
-
     #buildTable(){
         let rowDepth = this.#getRowDepth()
         let columnDepth = this.#getColumnDepth()
         let table =  Array.from(Array(rowDepth), () => Array.from(Array(columnDepth), () => new Cell(false)))
         this.setTable(table) 
         return table
-    }
-
-    createTableAndConfig(rowHook, columnHook){
-      let table = this.#buildTable() 
-      let acc = this.statisticHandler.getAccumulator()
-    
-      table.forEach(subarray => {
-        let row = rowHook()  
-        subarray.forEach(cell => {
-        let vitalStatus = cell.determineInitialVitalStatus()
-        if(cell.getVitalStatus())
-          ++acc.currentLivingCells
-
-
-        columnHook(row, vitalStatus)
-      })})
-      this.statisticHandler.processDataAndComputeCondition(acc)
     }
 
     refreshTable(){ 
@@ -157,7 +132,6 @@ class TableHandler {
       let isOverpopulated = cell.isOverpopulated(livingAdjacentCells)  
       if(isOverpopulated)  
         acc.incrementDeathsByOverpopulation()
-      
       return isOverpopulated
     }
 
@@ -227,16 +201,42 @@ class TableHandler {
       return adjacentCells.reduce((acc, cell) => {
        return cell.determineVitalStatus(evolvedIndicator) ? ++acc : acc }, 0 );
       }
-   
-    isOrganismStillEvolving(){
+
+     isOrganismStillEvolving(){
      return this.conditionHandler.isEvolving()
     }
+    
+
+
+   //#region external Functions
+
+   createTableAndConfig(rowHook, columnHook){
+    let table = this.#buildTable() 
+    let acc = this.statisticHandler.getAccumulator()
+  
+    table.forEach(subarray => {
+      let row = rowHook()  
+      subarray.forEach(cell => {
+      let vitalStatus = cell.determineInitialVitalStatus()
+      
+      if(cell.getVitalStatus())
+        ++acc.currentLivingCells
+
+      columnHook(row, vitalStatus)
+    })})
+    this.statisticHandler.processDataAndComputeCondition(acc)
+  }
 
     evolving(){
         this.refreshTable()
         setTimeout(this.evolving.bind(this), this.getInterval())
    }
-}
 
-let tableHandler = Object.freeze(new TableHandler());
-export default tableHandler;
+
+
+
+   //endregion
+
+
+
+}

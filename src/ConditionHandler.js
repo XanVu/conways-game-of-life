@@ -1,29 +1,12 @@
 
-let instance
-
 export default class ConditionHandler {
-    #started
-    #stopped
-    #isAlive
-    #isRepeatingPattern
-    #isEvolving
-    #changing
+    #started = false 
+    #isAlive = true
+    #isRepeatingPattern = false
+    #isEvolving = true
+    #changing = false
 
     constructor(){
-        if (instance)
-          throw new Error("Singleton")
-        
-        instance = this;
-        this.initToDefault()
-    }
-
-    initToDefault(){
-        this.#started = false
-        this.#stopped = false
-        this.#isAlive = true
-        this.#isRepeatingPattern = false
-        this.#isEvolving = true
-        this.#changing = false
     }
 
     resetChanging(){
@@ -36,10 +19,6 @@ export default class ConditionHandler {
 
     getStarted(){
         return this.#started
-    }
-  
-    getStopped(){
-        return this.#stopped
     }
       
     getIsAlive(){
@@ -54,13 +33,8 @@ export default class ConditionHandler {
         return this.#isEvolving
     }
   
-    setStarted(){
-        this.#started = true
-        this.setStopped(false)
-    }
-  
-    setStopped(bool){
-        this.#stopped = bool
+    setStarted(bool){
+        this.#started = bool
     }
   
     setIsAlive(bool){
@@ -80,6 +54,15 @@ export default class ConditionHandler {
     }
 
     isEvolving(){
-        return this.getStarted() && !this.getStopped() && this.getIsAlive() && !this.getIsRepeatingPattern() && this.getIsEvolving()
+        return this.getStarted() && this.getIsAlive() && !this.getIsRepeatingPattern() && this.getIsEvolving()
+    }
+
+    getConditionFlags(){
+        return {
+            isAlive: this.getIsAlive(),
+            isRepeatingPattern: this.getIsRepeatingPattern(),
+            isEvolving: this.getIsEvolving(),
+            started: this.getStarted()
+        }
     }
 }

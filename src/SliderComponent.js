@@ -1,6 +1,7 @@
 import * as constants from "./Constants";
 import StyleManager from "./StyleManager";
-import tableHandler from "./TableHandler";
+import tableComp from "./TableComponent";
+
 
 let instance
 
@@ -67,10 +68,15 @@ class SliderComponent {
       return span
     }
 
+    getCurrentSliderValue(){
+      let slider = this.#getSlider()
+      return slider.value
+    }
+
     #connectSliderToOrganism(){
       let slider = this.#getSlider()
       slider.addEventListener(constants.input,() => {
-      tableHandler.setInterval(slider.value)})
+      tableComp.setInterval(slider.value)})
     }
 }
 

@@ -1,10 +1,10 @@
 'use strict';
+
 import navbar from './NavigationComponent';
 import controls from './ControlsComponent';
-import table from './TableComponent'
-import tableHandler from './TableHandler';
 import tabs from './TabComponent';
 import slider from './SliderComponent';
+import tableComp from './TableComponent';
 
 loadApp()
 
@@ -13,6 +13,6 @@ loadApp()
     tabs.loadingTabs()
     controls.loadingControls()
     slider.loadingSlider()
-    tableHandler.createTableAndConfig(table.addRow.bind(table), table.addCell.bind(table))
+    tableComp.initTable()
     tabs.refreshStatisticTab()
  }
