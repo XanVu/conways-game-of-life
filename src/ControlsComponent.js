@@ -7,7 +7,7 @@ let instance
 class ControlsComponent {    
     #startButton
     #stopButton
-    #resetButton
+    #refreshButton
 
   constructor(){
     if (instance)
@@ -23,8 +23,12 @@ class ControlsComponent {
     return this.#stopButton
   }
 
+  #getRefreshButton(){
+    return this.#refreshButton
+  }
+
   #createButton(iconShape, isHidden = false){
-    let parentNode = document.getElementById('controlsContainer')  
+    let parentNode = document.getElementById('controls-wrapper')  
     let button = document.createElement('button') 
     
     let controllCssClass = 'controls'
@@ -46,24 +50,17 @@ class ControlsComponent {
     let startButton = this.#createButton(constants.playIcon)
     let stopButton =  this.#createButton(constants.stopIcon, isHidden)
     let resetButton = this.#createButton(constants.resetIcon)
-    let settingButton = this.#createButton(constants.settingIcon)
     
     this.#startButton = startButton
     this.#stopButton = stopButton
-    this.#resetButton = resetButton
+    this.#refreshButton = resetButton
 
     startButton.addEventListener(constants.click, this.#startEvolvingProcess.bind(this))
     stopButton.addEventListener(constants.click, this.#stopEvolvingProcess.bind(this))
     resetButton.addEventListener(constants.click, this.#resetEvolvingProcess.bind(this))
-    settingButton.addEventListener(constants.click, this.#toggleSettingsTab)
   }
 
-  #toggleSettingsTab(){
-    let settingsWrapper = document.getElementById('settingsWrapper')
-    StyleManager.toggleElementsVisibilty(settingsWrapper)
-  }
-
-  #toggleStartStop(){
+  toggleStartStop(){
     let start = this.#getStartButton()
     let stop = this.#getStopButton()
 
@@ -84,27 +81,36 @@ class ControlsComponent {
     StyleManager.hideElement(stop)
   }
 
+  hideStopButtonIfActive(){
+    let start = this.#getStartButton()
+    let stop = this.#getStopButton()
+    if(!stop.classList.contains('isHidden')){
+      StyleManager.hideElement(stop)
+      start.classList.remove('isHidden')
+    }
+  }
 
+ 
   #startEvolvingProcess(){
     let conditionFlags = tableComp.sentConditionFlags()
 
     if(conditionFlags.isAlive && conditionFlags.isEvolving && !conditionFlags.isRepeatingPattern){
       tableComp.evolving()
-         this.#toggleStartStop()
+         this.toggleStartStop()
     }
   }
 
   #stopEvolvingProcess(){   
         tableComp.stop()
-        this.#toggleStartStop()
+        this.toggleStartStop()
   }
 
   #resetEvolvingProcess(){
         tableComp.stop()
-        tableComp.resetTable()
+        tableComp.resetTable(10, 10)
         let start = this.#getStartButton()
         if(StyleManager.isHidden(start))
-          this.#toggleStartStop()
+          this.toggleStartStop()
 
         tabs.refreshStatisticTab()
   }

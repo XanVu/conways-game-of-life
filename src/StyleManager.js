@@ -1,7 +1,7 @@
 export default class StyleManager{
    static #isHidden = 'isHidden'
-   static #isAlive = 'livingCircle'
-   static #isDead = 'deadCircle'
+   static #isAlive = 'living'
+   static #isDead = 'dead'
 
 
    static hideElement(element){

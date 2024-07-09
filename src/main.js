@@ -9,10 +9,10 @@ import tableComp from './TableComponent';
 loadApp()
 
  function loadApp(){
-    navbar.loadingNavBar()
-    tabs.loadingTabs()
-    controls.loadingControls()
-    slider.loadingSlider()
-    tableComp.initTable()
-    tabs.refreshStatisticTab()
+   navbar.loadingNavBar() 
+   slider.loadingSlider()
+   controls.loadingControls() 
+   tableComp.initTable()
+   tableComp.resizeEvent()
+   tabs.loadingTabs()
  }

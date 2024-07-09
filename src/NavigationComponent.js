@@ -18,7 +18,6 @@ class NavigationComponent {
 
   loadingNavBar(){
    let nav = document.getElementById('navigation')
-   let list = document.createElement('ul')
    let linkList = this.getNavBarLinks()   
    let navItems = constants.navItems
 
@@ -28,9 +27,8 @@ class NavigationComponent {
       linkList.push(link)
       link.textContent = navItems[i]
       listItem.appendChild(link)
-      list.appendChild(listItem)
+      nav.appendChild(listItem)
    }
-   nav.appendChild(list)
   }
 }
 

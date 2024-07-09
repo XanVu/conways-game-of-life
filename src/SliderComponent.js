@@ -6,8 +6,7 @@ import tableComp from "./TableComponent";
 let instance
 
 class SliderComponent {
-    #settingsWrapper
-    #settingsContainer
+    #sliderContainer
     #sliderInput
 
 
@@ -17,18 +16,13 @@ class SliderComponent {
 
       instance = this
 
-      this.#settingsWrapper = document.getElementById('settingsWrapper') 
-      this.#settingsContainer = document.getElementById('settingsContainer')
+      this.#sliderContainer = document.getElementById('slider-wrapper')
       this.#sliderInput = document.getElementById('sliderInput')
 
     }
 
-    #getSettingsWrapper(){
-      return this.#settingsWrapper
-    }
-
-    #getSettingsContainer(){
-      return this.#settingsContainer
+    #getSliderContainer(){
+      return this.#sliderContainer
     }
 
     #getSlider(){
@@ -36,21 +30,18 @@ class SliderComponent {
     }
 
     loadingSlider(){
-      let settingsWrapper = this.#getSettingsWrapper()
-      StyleManager.hideElement(settingsWrapper)
-      let settingsTab = this.#getSettingsContainer()
-      StyleManager.addCssClass(settingsTab, 'tooltip')
+      let sliderWrapper = this.#getSliderContainer()
+      StyleManager.addCssClass(sliderWrapper, 'tooltip')
       let sliderDiv = this.#buildSliderDiv()
       let tooltip = this.#createToolTip()
-      settingsTab.appendChild(tooltip)
-      settingsTab.appendChild(sliderDiv)
+      sliderWrapper.insertBefore(tooltip, sliderWrapper.firstChild)
+      sliderWrapper.appendChild(sliderDiv)
       this.#connectSliderToOrganism()
     }
 
     #buildSliderDiv(){
       let sliderDiv = document.createElement('div')
       let intervals = constants.sliderIntervals
-
       StyleManager.addCssClass(sliderDiv,'slider')
     
       for (var i = 0; i < intervals.length; i++) {
@@ -76,6 +67,8 @@ class SliderComponent {
     #connectSliderToOrganism(){
       let slider = this.#getSlider()
       slider.addEventListener(constants.input,() => {
+
+        console.log(slider.value)
       tableComp.setInterval(slider.value)})
     }
 }
