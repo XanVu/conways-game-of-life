@@ -5,8 +5,8 @@ import tableComp from "./TableComponent.js";
 import tabs from "./TabComponent.js";
 
 export default class TableHandler {
-    #rowDepth = 45
-    #columDepth = 45
+    #rowDepth
+    #columnDepth
     #table   
     #interval
     #repetitionCounter = 0
@@ -14,10 +14,13 @@ export default class TableHandler {
     conditionHandler
     statisticHandler
 
-    constructor(){
+    constructor(rowDepth, columnDepth){
       this.statisticHandler = new StatisticHandler()
       this.conditionHandler = new ConditionHandler()
+      this.#rowDepth = rowDepth
+      this.#columnDepth = columnDepth
     }
+
 
   //#region GetterSetter
 
@@ -31,7 +34,7 @@ export default class TableHandler {
     }
 
     #getColumnDepth(){
-      return this.#columDepth
+      return this.#columnDepth
     }
 
     #getRepetitionCounter(){
@@ -51,7 +54,7 @@ export default class TableHandler {
     }
 
     setColumnDepth(size){
-      this.#columDepth = size 
+      this.#columnDepth = size 
 
    }
 
@@ -205,9 +208,7 @@ export default class TableHandler {
      isOrganismStillEvolving(){
      return this.conditionHandler.isEvolving()
     }
-    
-
-
+  
    //#region external Functions
 
    createTableAndConfig(rowHook, columnHook){
@@ -232,11 +233,5 @@ export default class TableHandler {
         setTimeout(this.evolving.bind(this), this.getInterval())
    }
 
-
-
-
    //endregion
-
-
-
 }

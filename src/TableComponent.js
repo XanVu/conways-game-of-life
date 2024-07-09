@@ -2,6 +2,8 @@ import StyleManager from "./StyleManager.js";
 import statisticComponent from "./StatisticComponent.js";
 import TableHandler from "./TableHandler.js";
 import slider from "./SliderComponent.js";
+import navbar from "./NavigationComponent.js";
+import controls from "./ControlsComponent.js";
 
 let instance
 class TableComponent {
@@ -12,11 +14,9 @@ class TableComponent {
   constructor(){
     if (instance)
       throw new Error("Singleton")
-    this.#tableHandler = new TableHandler()
     instance = this 
     this.#table = document.querySelector("table")
-   
-   }
+  }
 
   #getTable(){
     return this.#table
@@ -35,10 +35,10 @@ class TableComponent {
     table.setInterval(value)
   }
 
-    deleteTableAndResetData(){
+    deleteTableAndResetData(row, column){     
       let table = this.#getTable()
       Array.from(table.rows).forEach(row => row.remove())
-      this.#setTableHandler(new TableHandler())
+      this.#setTableHandler(new TableHandler(row, column))
       this.initTable()  
     }
     
@@ -54,7 +54,8 @@ class TableComponent {
       }
 
       #createCellSpan(cell, vitalStatus){
-        let span = document.createElement("span")             
+        let span = document.createElement("span")
+        StyleManager.addCssClass(span, 'circle')             
         cell.appendChild(span)
         StyleManager.styleCell(span, vitalStatus)
       }
@@ -66,14 +67,16 @@ class TableComponent {
         StyleManager.styleCell(span, vitalStatus)
       }
 
-      resetTable(){
+      resetTable(r, c){
         this.stop()
-        this.deleteTableAndResetData()
+        this.deleteTableAndResetData(r, c)
         statisticComponent.createStatPresentation()
       }
 
       initTable(){
-        let table = this.#getTableHandler()
+        let dims = this.calculateTableDimensions()
+        let table =  new TableHandler(dims.rows, dims.columns)
+        this.#setTableHandler(table)
         table.createTableAndConfig(this.#addRow.bind(this), this.#addCell.bind(this))
         this.setInterval(slider.getCurrentSliderValue())
       }
@@ -102,6 +105,54 @@ class TableComponent {
       stop(){
         let table = this.#getTableHandler()
         table.conditionHandler.setStarted(false)
+      }
+
+      resizeEvent(){
+        window.addEventListener('resize', () => {
+        let dim = this.calculateTableDimensions()  
+        this.resetTable(dim.rows, dim.columns)
+
+        controls.hideStopButtonIfActive() 
+
+        })
+      }
+
+      calculateTableDimensions(){
+        let tableContainer = document.getElementById('table-wrapper')
+        let tablepaddingAndBorder = 16
+        let tdSize = 13
+    
+        let clientWidth = tableContainer.clientWidth
+        let clientHeight = tableContainer.clientHeight
+        
+        let colOffset 
+        let rowOffset
+
+        if(clientWidth < clientHeight){
+        colOffset = 30
+        rowOffset = 25 + 50
+        }
+        else {
+          colOffset = 150
+          rowOffset = 25 + 50
+        }
+
+        let columns = Math.floor((clientWidth - tablepaddingAndBorder * 2 - colOffset) / tdSize)
+        let rows = Math.floor((clientHeight - tablepaddingAndBorder * 2 - rowOffset) / tdSize)
+
+        if(columns > 75)
+          columns = 75
+
+        if(rows > 75)
+          rows = 75
+
+        if(rows < 15)
+          rows = 15
+
+        if(columns < 15)
+          columns = 15
+
+        return {rows: rows, columns: columns }
       }
 }
 
