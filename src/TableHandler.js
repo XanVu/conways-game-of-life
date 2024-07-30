@@ -2,21 +2,19 @@ import StatisticHandler from "./StatisticHandler.js";
 import Cell from "./Cell.js";
 import ConditionHandler from "./ConditionHandler.js";
 import tableComp from "./TableComponent.js";
-import tabs from "./TabComponent.js";
 
 export default class TableHandler {
     #rowDepth
     #columnDepth
     #table   
-    #interval
     #repetitionCounter = 0
     #repetitionThreshold = 5
-    conditionHandler
-    statisticHandler
+    #conditionHandler
+    #statisticHandler
 
     constructor(rowDepth, columnDepth){
-      this.statisticHandler = new StatisticHandler()
-      this.conditionHandler = new ConditionHandler()
+      this.#statisticHandler = new StatisticHandler()
+      this.#conditionHandler = new ConditionHandler()
       this.#rowDepth = rowDepth
       this.#columnDepth = columnDepth
     }
@@ -28,12 +26,20 @@ export default class TableHandler {
     getTable(){
       return this.#table
     }
+    
+    getStatisticHandler(){
+      return this.#statisticHandler
+    }
 
-    #getRowDepth(){
+    getConditionHandler(){
+      return this.#conditionHandler
+    }
+
+    getRowDepth(){
       return this.#rowDepth
     }
 
-    #getColumnDepth(){
+    getColumnDepth(){
       return this.#columnDepth
     }
 
@@ -43,10 +49,6 @@ export default class TableHandler {
 
     #getRepetitionThreshold(){
       return this.#repetitionThreshold
-    }
-
-    getInterval(){
-      return this.#interval
     }
 
     setRowDepth(size){
@@ -61,11 +63,6 @@ export default class TableHandler {
     setTable(table){
       this.#table = table 
     } 
-
-    setInterval(interval){
-      this.#interval = interval
-    }
-
     //#endregion
 
 
@@ -78,19 +75,19 @@ export default class TableHandler {
     }
 
     #buildTable(){
-        let rowDepth = this.#getRowDepth()
-        let columnDepth = this.#getColumnDepth()
+        let rowDepth = this.getRowDepth()
+        let columnDepth = this.getColumnDepth()
         let table =  Array.from(Array(rowDepth), () => Array.from(Array(columnDepth), () => new Cell(false)))
         this.setTable(table) 
         return table
     }
 
-    refreshTable(){ 
+    #refreshTable(){ 
       let array = this.getTable()
-      let acc = this.statisticHandler.getAccumulator()
+      let statisticHandler = this.getStatisticHandler()
+      let acc = statisticHandler.getAccumulator()
 
-      if(this.isOrganismStillEvolving()){
-        array.forEach((subarray, row) => subarray.forEach((cell, col) => {
+      array.forEach((subarray, row) => subarray.forEach((cell, col) => {
             let adjacentCells = this.#getAdjacentCells(row, col)
             let livingAdjacentCells = this.#calculateNumberOfLivingAdjacentCells(adjacentCells)
             let vitalStatus = this.#validateEvolution(acc, cell, livingAdjacentCells)
@@ -99,8 +96,6 @@ export default class TableHandler {
             tableComp.refreshCell(row, col, vitalStatus)
           })) 
             this.#validateTableRelatedConditions(acc)
-            tabs.refreshStatisticTab() 
-          }
   }
 
     #validateEvolution(acc, cell, livingAdjacentCells){ 
@@ -146,36 +141,42 @@ export default class TableHandler {
     }
 
     #validateChangeBehavior(cell) {
+      let conditionHandler = this.getConditionHandler()
+
       if(cell.hasSwitchedStatus())
-        this.conditionHandler.setChanging(cell.hasSwitchedStatus())
+        conditionHandler.setChanging(cell.hasSwitchedStatus())
     }
     
   
     #validateTableRelatedConditions(acc){
-    let isRepeating = this.statisticHandler.processDataAndComputeCondition(acc)
-    let currentLivingCells = this.statisticHandler.getCurrentLivingCells()
+      let statisticHandler = this.getStatisticHandler()
+      let conditionHandler = this.getConditionHandler()
 
-    isRepeating ? this.#incrementRepetitionCounter() : this.#resetRepetitionCounter()
-    let repetitionCounter = this.#getRepetitionCounter()
+      let isRepeating = statisticHandler.processDataAndComputeCondition(acc)
+      let currentLivingCells = statisticHandler.getCurrentLivingCells()
+
+      isRepeating ? this.#incrementRepetitionCounter() : this.#resetRepetitionCounter()
+      let repetitionCounter = this.#getRepetitionCounter()
     
-    if(repetitionCounter >= this.#getRepetitionThreshold())
-      this.conditionHandler.setIsRepeatingPattern(true)
+       if(repetitionCounter >= this.#getRepetitionThreshold())
+          conditionHandler.setIsRepeatingPattern(true)
 
-    if(currentLivingCells	 == 0)
-      this.conditionHandler.setIsAlive(false)
+        if(currentLivingCells	 == 0)
+          conditionHandler.setIsAlive(false)
 
-    this.#confirmChangeBehavior()
+        this.#confirmChangeBehavior()
     }
 
     #confirmChangeBehavior(){
-      let evolved = this.conditionHandler.getChanging()
-      this.conditionHandler.setIsEvolving(evolved)
-      this.conditionHandler.resetChanging()
+      let conditionHandler = this.getConditionHandler()
+      let evolved = conditionHandler.getChanging()
+      conditionHandler.setIsEvolving(evolved)
+      conditionHandler.resetChanging()
     }
 
   #getAdjacentCells(row, col){
-    let rowDepth = this.#getRowDepth()
-    let columnDepth = this.#getColumnDepth()
+    let rowDepth = this.getRowDepth()
+    let columnDepth = this.getColumnDepth()
     let identityPoint = {row: row, col: col}
 
     let columns = Array((col - 1), col, ( col + 1)).map(index => this.#calculateValidIndex(index, columnDepth))
@@ -200,20 +201,23 @@ export default class TableHandler {
     }
 
     #calculateNumberOfLivingAdjacentCells(adjacentCells){
-      let evolvedIndicator = this.statisticHandler.getGeneration()
+      let statisticHandler = this.getStatisticHandler()
+      let evolvedIndicator = statisticHandler.getGeneration()
       return adjacentCells.reduce((acc, cell) => {
        return cell.determineVitalStatus(evolvedIndicator) ? ++acc : acc }, 0 );
       }
 
      isOrganismStillEvolving(){
-     return this.conditionHandler.isEvolving()
+        let conditionHandler = this.getConditionHandler()
+        return conditionHandler.isEvolving()
     }
   
    //#region external Functions
 
    createTableAndConfig(rowHook, columnHook){
     let table = this.#buildTable() 
-    let acc = this.statisticHandler.getAccumulator()
+    let statisticHandler = this.getStatisticHandler()
+    let acc = statisticHandler.getAccumulator()
   
     table.forEach(subarray => {
       let row = rowHook()  
@@ -225,12 +229,18 @@ export default class TableHandler {
 
       columnHook(row, vitalStatus)
     })})
-    this.statisticHandler.processDataAndComputeCondition(acc)
+    statisticHandler.processDataAndComputeCondition(acc)
   }
 
     evolving(){
-        this.refreshTable()
-        setTimeout(this.evolving.bind(this), this.getInterval())
+
+      if(this.isOrganismStillEvolving()){
+       this.#refreshTable()
+        let statisticHandler = this.getStatisticHandler()
+        tableComp.refreshStatisticTab(statisticHandler.getCurrentStatistics())
+        tableComp.determineStatus()    
+        setTimeout(this.evolving.bind(this), 25)
+      }
    }
 
    //endregion
