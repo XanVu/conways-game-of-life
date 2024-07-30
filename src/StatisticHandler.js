@@ -82,7 +82,7 @@ export default class StatisticHandler {
         return previousLivingCells == currentLivingCells
       }      
   
-      sendCurrentStatisticsToComponent(){
+      getCurrentStatistics(){
         let dataStructureForComponent = {
           generation: this.getGeneration(),
           overallLivingCells: this.#getOverallLivingCells(),
@@ -90,6 +90,8 @@ export default class StatisticHandler {
           fatalitiesOfUnderpopulation: this.#getFatalitiesOfUnderpopulation(),
           resurrectedCells: this.#getResurrectedCells(),
         }
+
+        this.resetCurrentLivingCells()
         return dataStructureForComponent
       }
 
@@ -135,7 +137,7 @@ export default class StatisticHandler {
       }
 
       #validateRepetitionAndCache(){
-         let isRepeating = this.#compareLivingCellsForRepetition()
+        let isRepeating = this.#compareLivingCellsForRepetition()
         this.#cacheCurrentLivingCells()
         return isRepeating
       }

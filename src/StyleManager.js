@@ -28,7 +28,7 @@ export default class StyleManager{
       element.classList.toggle(StyleManager.#isHidden)
    }
 
-   static hideAllElments(elements){
+   static hideElments(elements){
       let arr = Array.from(elements)
       arr.forEach(element =>  StyleManager.hideElement(element))
    }

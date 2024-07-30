@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <title>Conway game of life</title>
@@ -8,26 +9,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <nav>
-      <span>CONWAY'S GAME OF LIFE</span>
-      <input id="menu-toggle" type="checkbox" />
-        <label class='menu-button-container' for="menu-toggle">
-          <div class='menu-button'></div>
-        </label>
-    <ul id ="navigation" class="menu">
-    </ul>
-  </nav>
+   
+
 <div id="flexContainer" > 
+  <nav>  
+    <span>CONWAY'S GAME OF LIFE</span> 
+    <div id="controls-wrapper"> </div>
+  </nav>
   <div id="tab-wrapper">
   </div>
-  <div id="controls-wrapper"> 
-  </div>
   <div id="table-wrapper">
+    <div id="status-wrapper">
+    </div>
     <table></table> 
   </div> 
-  <div id="slider-wrapper">
-    <input id="sliderInput" type="range" min="0" max="300" step="150" value="0">
-  </div>
 </div>
 </body>
 <script src="main.js"></script>
