@@ -7,7 +7,6 @@ class ControlsComponent {
   #startButton
   #stopButton
   #resetButton
-  #statisticButton
 
   constructor(){
     if (instance)
@@ -33,10 +32,6 @@ class ControlsComponent {
     return this.#resetButton
   }
 
-  getStatisticButton(){
-    return this.#statisticButton
-  }
-
   #setStartButton(btn){
     this.#startButton = btn
   }
@@ -49,9 +44,6 @@ class ControlsComponent {
     this.#resetButton = btn
   }
 
-  #setStatisticButton(btn){
-    this.#statisticButton = btn
-  }
 
   #buildButton(type){
     let wrapper = this.#getControlsWrapper()
@@ -69,16 +61,12 @@ class ControlsComponent {
   } 
 
   loading(){
-    let statisticButton = this.#buildButton(constants.statisticIcon)
     let resetButton = this.#buildButton(constants.resetIcon)
     let startButton = this.#buildButton(constants.playIcon)
     let stopButton =  this.#buildButton(constants.stopIcon)
-
     this.#setStartButton(startButton)
     this.#setStopButton(stopButton)
     this.#setResetButton(resetButton)
-    this.#setStatisticButton(statisticButton)
-
     this.#hideButton(stopButton)
   }
 
@@ -114,6 +102,11 @@ class ControlsComponent {
   hideStopButton(){
     let btn = this.getStopButton()
     this.#hideButton(btn)
+  }
+
+  hideControls(){
+    this.hideStartButton()
+    this.hideStopButton()
   }
 }
 

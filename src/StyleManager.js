@@ -3,7 +3,6 @@ export default class StyleManager{
    static #isAlive = 'living'
    static #isDead = 'dead'
 
-
    static hideElement(element){
     element.classList.add(StyleManager.#isHidden)
    }
@@ -12,20 +11,8 @@ export default class StyleManager{
     element.classList.remove(StyleManager.#isHidden)
    }
 
-   static isHidden(element){
-    return element.classList.contains(StyleManager.#isHidden)
-   }
-
-   static toggleElementsVisibilty(element){
-    StyleManager.isHidden(element) ? StyleManager.showElement(element) : StyleManager.hideElement(element)
-   }
-
    static addCssClass(element, styleClass){
       element.classList.add(styleClass)
-   }
-
-   static toggleVisibility(element){
-      element.classList.toggle(StyleManager.#isHidden)
    }
 
    static hideElments(elements){
