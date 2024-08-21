@@ -1,182 +1,116 @@
-import StatisticHandler from "./StatisticHandler.js";
 import Cell from "./Cell.js";
-import ConditionHandler from "./ConditionHandler.js";
 import tableComp from "./TableComponent.js";
+import controls from "./ControlsComponent.js";
 
-export default class TableHandler {
-    #rowDepth
-    #columnDepth
-    #table   
-    #repetitionCounter = 0
-    #repetitionThreshold = 5
-    #conditionHandler
-    #statisticHandler
+//handles all the logic that is required, so traversing the 2D array and the looping function 
 
-    constructor(rowDepth, columnDepth){
-      this.#statisticHandler = new StatisticHandler()
-      this.#conditionHandler = new ConditionHandler()
-      this.#rowDepth = rowDepth
-      this.#columnDepth = columnDepth
+export default class TableHandler {  
+  #table
+  #rows
+  #columns     
+  #generation = 1
+  #isLooping = false
+
+    constructor(rows, columns){
+      this.#rows = rows
+      this.#columns = columns
     }
 
-
-  //#region GetterSetter
-
+  // #region Getter
 
     getTable(){
       return this.#table
     }
-    
-    getStatisticHandler(){
-      return this.#statisticHandler
+
+    getRows(){
+      return this.#rows
     }
 
-    getConditionHandler(){
-      return this.#conditionHandler
+    getColumns(){
+      return this.#columns
     }
 
-    getRowDepth(){
-      return this.#rowDepth
-    }
+  // #endregion Setter  
 
-    getColumnDepth(){
-      return this.#columnDepth
-    }
-
-    #getRepetitionCounter(){
-      return this.#repetitionCounter
-    }
-
-    #getRepetitionThreshold(){
-      return this.#repetitionThreshold
-    }
-
-    setRowDepth(size){
-       this.#rowDepth = size
-    }
-
-    setColumnDepth(size){
-      this.#columnDepth = size 
-
-   }
+  // #region Setter 
 
     setTable(table){
       this.#table = table 
     } 
-    //#endregion
 
-
-    #incrementRepetitionCounter(){
-      this.#repetitionCounter += 1
+    setRows(rows){
+       this.#rows = rows
     }
 
-    #resetRepetitionCounter(){
-      this.#repetitionCounter = 0
+    setColumns(columns){
+      this.#columns = columns 
     }
 
-    #buildTable(){
-        let rowDepth = this.getRowDepth()
-        let columnDepth = this.getColumnDepth()
-        let table =  Array.from(Array(rowDepth), () => Array.from(Array(columnDepth), () => new Cell(false)))
-        this.setTable(table) 
-        return table
+    setIsLooping(bool){
+      this.#isLooping = bool
     }
 
-    #refreshTable(){ 
-      let array = this.getTable()
-      let statisticHandler = this.getStatisticHandler()
-      let acc = statisticHandler.getAccumulator()
+  // #endregion  
 
-      array.forEach((subarray, row) => subarray.forEach((cell, col) => {
-            let adjacentCells = this.#getAdjacentCells(row, col)
-            let livingAdjacentCells = this.#calculateNumberOfLivingAdjacentCells(adjacentCells)
-            let vitalStatus = this.#validateEvolution(acc, cell, livingAdjacentCells)
-            this.#accumulatedLivingCellsAfterEvolving(acc, cell)
-            this.#validateChangeBehavior(cell)
-            tableComp.refreshCell(row, col, vitalStatus)
-          })) 
-            this.#validateTableRelatedConditions(acc)
+  // #region Increments
+    
+  #incrementGeneration(){
+    ++this.#generation
   }
 
-    #validateEvolution(acc, cell, livingAdjacentCells){ 
+  //#endregion
+
+  
+  // builds a 2 dimensional array that will hold all the cells, sets the internal table variable
+  #buildTable(){
+    let rowDepth = this.getRows()
+    let columnDepth = this.getColumns()
+    let table =  Array.from(Array(rowDepth), () => Array.from(Array(columnDepth), () => new Cell(false)))
+    this.setTable(table) 
+    return table
+  }
+
+  // updates every cell within the table by getting the adjacent cells, calculate the living cells, validate the new cell status and refreshing the reprensentation table
+  // in the end we increment the generation variable
+  #refreshTable(){ 
+    let array = this.getTable()   
+    array.forEach((subarray, row) => subarray.forEach((cell, col) => {
+        let adjacentCells = this.#getAdjacentCells(row, col)
+        let livingAdjacentCells = this.#calculateNumberOfLivingAdjacentCells(adjacentCells)
+        let vitalStatus = this.#validateEvolution(cell, livingAdjacentCells)
+        tableComp.refreshCell(row, col, vitalStatus)
+      }))
+    
+    this.#incrementGeneration()      
+  }
+
+
+  // evalutes the next cell status depending if the current status is alive or dead and uses the adjacent living cells of that cell to calculate the next status
+  // saves the calculation result within the cell and the old status gets saved in the cell cache 
+    #validateEvolution(cell, livingAdjacentCells){ 
       let evolvedVitalStatus
       
       if(cell.getVitalStatus()){
-        let isUnderpopulated = this.#validateUnderpopulation(acc, cell, livingAdjacentCells)
-        let isOverpopulated = this.#validateOverpopulation(acc, cell, livingAdjacentCells)
+        let isUnderpopulated = cell.isUnderpopulated(livingAdjacentCells)
+        let isOverpopulated = cell.isOverpopulated(livingAdjacentCells)
         evolvedVitalStatus = !isUnderpopulated && !isOverpopulated
       }
-      else{
-        evolvedVitalStatus = this.#validateRessurection(acc, cell, livingAdjacentCells)     
-      }
+      else 
+        evolvedVitalStatus = cell.isResurrected(livingAdjacentCells)
+  
       cell.cacheVitalStatusAndEvolveTo(evolvedVitalStatus)
       return evolvedVitalStatus
     }
 
-    #accumulatedLivingCellsAfterEvolving(acc, cell){
-      if(cell.getVitalStatus()) 
-        acc.incrementLivingCells()
-    }
 
-    #validateUnderpopulation(acc, cell, livingAdjacentCells){
-      let isUnderpopulated = cell.isUnderpopulated(livingAdjacentCells)
-      if(isUnderpopulated)
-         acc.incrementDeathsByUnderpopulation()
-
-      return isUnderpopulated
-    }
-
-    #validateOverpopulation(acc, cell, livingAdjacentCells){ 
-      let isOverpopulated = cell.isOverpopulated(livingAdjacentCells)  
-      if(isOverpopulated)  
-        acc.incrementDeathsByOverpopulation()
-      return isOverpopulated
-    }
-
-    #validateRessurection(acc, cell, livingAdjacentCells){
-      let isResurrected = cell.isResurrected(livingAdjacentCells)
-      if(isResurrected)
-        acc.incrementRessurectedCells()
-      return isResurrected
-    }
-
-    #validateChangeBehavior(cell) {
-      let conditionHandler = this.getConditionHandler()
-
-      if(cell.hasSwitchedStatus())
-        conditionHandler.setChanging(cell.hasSwitchedStatus())
-    }
-    
-  
-    #validateTableRelatedConditions(acc){
-      let statisticHandler = this.getStatisticHandler()
-      let conditionHandler = this.getConditionHandler()
-
-      let isRepeating = statisticHandler.processDataAndComputeCondition(acc)
-      let currentLivingCells = statisticHandler.getCurrentLivingCells()
-
-      isRepeating ? this.#incrementRepetitionCounter() : this.#resetRepetitionCounter()
-      let repetitionCounter = this.#getRepetitionCounter()
-    
-       if(repetitionCounter >= this.#getRepetitionThreshold())
-          conditionHandler.setIsRepeatingPattern(true)
-
-        if(currentLivingCells	 == 0)
-          conditionHandler.setIsAlive(false)
-
-        this.#confirmChangeBehavior()
-    }
-
-    #confirmChangeBehavior(){
-      let conditionHandler = this.getConditionHandler()
-      let evolved = conditionHandler.getChanging()
-      conditionHandler.setIsEvolving(evolved)
-      conditionHandler.resetChanging()
-    }
+  // Takes a point and calculates the adjacent points (cells)
+  // For the point (1,1) -> (0,0)(0,1)(0,2) (1,0)(1,1)(1,2) (2,0)(2,1)(2,2)
+  // Additionally this functions ensures valid values of the cells, so we dont get IndexOutOfBoundExceptions
+  // Afterwards we eliminate the identity of that list of points (1,1), we only want the surroundings points and transform these into cell coordinates
 
   #getAdjacentCells(row, col){
-    let rowDepth = this.getRowDepth()
-    let columnDepth = this.getColumnDepth()
+    let rowDepth = this.getRows()
+    let columnDepth = this.getColumns()
     let identityPoint = {row: row, col: col}
 
     let columns = Array((col - 1), col, ( col + 1)).map(index => this.#calculateValidIndex(index, columnDepth))
@@ -187,61 +121,50 @@ export default class TableHandler {
     return adjacentCells
     }
 
+    // using the mod function we ensure that we only get positive values, which a within the size barrier
     #calculateValidIndex(index, size){
       return this.#mod(index, size)
      }
   
+    // a mod function 
     #mod(a,b){
       return a - (Math.floor(a / b) * b)
     }
 
+    // gets the cell within the table with a point (row, column)
     #getCellbyCoordinate(row, col){
       let table = this.getTable()
           return table[row][col]
     }
 
+
+    // calculates a value that is equal to the number of cell which are alive
     #calculateNumberOfLivingAdjacentCells(adjacentCells){
-      let statisticHandler = this.getStatisticHandler()
-      let evolvedIndicator = statisticHandler.getGeneration()
+      let gen = this.#generation
       return adjacentCells.reduce((acc, cell) => {
-       return cell.determineVitalStatus(evolvedIndicator) ? ++acc : acc }, 0 );
+       return cell.determineVitalStatus(gen) ? ++acc : acc }, 0 );
       }
-
-     isOrganismStillEvolving(){
-        let conditionHandler = this.getConditionHandler()
-        return conditionHandler.isEvolving()
-    }
   
-   //#region external Functions
-
+   // a function with callbacks to the TableComponent to build the representation of the cell table within one loop only
    createTableAndConfig(rowHook, columnHook){
     let table = this.#buildTable() 
-    let statisticHandler = this.getStatisticHandler()
-    let acc = statisticHandler.getAccumulator()
   
     table.forEach(subarray => {
       let row = rowHook()  
       subarray.forEach(cell => {
       let vitalStatus = cell.determineInitialVitalStatus()
-      
-      if(cell.getVitalStatus())
-        ++acc.currentLivingCells
-
       columnHook(row, vitalStatus)
     })})
-    statisticHandler.processDataAndComputeCondition(acc)
   }
 
+    // the looping function refreshes the table as long it was set to looping and the generation is smaller than 500 else we stop and hide the controls
     evolving(){
-
-      if(this.isOrganismStillEvolving()){
-       this.#refreshTable()
-        let statisticHandler = this.getStatisticHandler()
-        tableComp.refreshStatisticTab(statisticHandler.getCurrentStatistics())
-        tableComp.determineStatus()    
+      if(this.#isLooping && this.#generation <= 500){
+        this.#refreshTable()
         setTimeout(this.evolving.bind(this), 25)
       }
+      else if (this.#generation > 500) {
+        controls.hideControls()
+      }
    }
-
-   //endregion
 }

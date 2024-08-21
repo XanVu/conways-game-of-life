@@ -1,52 +1,67 @@
+import * as constants from './Constants';
+
+// class that holds all neccessary information about a cell and provide functions to validate adjacent cells
 export default class Cell { 
     #evolvedIndicator = 1
-    #vitalStatus
     #cachedStatus = false
-
+    #vitalStatus
+    
     constructor(vitalStatus){
       this.#vitalStatus = vitalStatus
     }
 
+    // #region Getter
+
     #getEvolvedIndicator(){
       return this.#evolvedIndicator
+    }
+    
+    #getCachedStatus(){
+      return this.#cachedStatus
     }
     
     getVitalStatus(){
       return this.#vitalStatus
     }  
     
-    #getCachedStatus(){
-      return this.#cachedStatus
-    }
+    // #endregion
 
-    #incrementEvolvedIndicator(){
-      this.#evolvedIndicator += 1
+    // #region Setter 
+
+    #setCachedStatus(status){
+      this.#cachedStatus = status
     }
 
     #setVitalStatus(vitalStatus){
       this.#vitalStatus = vitalStatus
     }
 
-    #setCachedStatus(status){
-      this.#cachedStatus = status
+    // #endregion
+
+    // #region Increments 
+
+    #incrementEvolvedIndicator(){
+      ++this.#evolvedIndicator
     }
 
+    // #endregion 
+
+    // cell is underpopulated if it has less than 2 adjacent living cells
     isUnderpopulated(adjacentLivingCells){
       return adjacentLivingCells < 2  
     }
 
+    // cell is overpopulated if it has more than 3 adjacent living cells
     isOverpopulated(adjacentLivingCells){
       return adjacentLivingCells > 3
     }
 
+    // cell gets resurrected if it excatly 3 adjacent living cells
     isResurrected(adjacentLivingCells){
       return adjacentLivingCells == 3
     }
-
-    hasSwitchedStatus(){
-      return this.getVitalStatus() != this.#getCachedStatus()
-    }
-
+    
+    // Saves the status within cache and sets the new status and increments the indicator
     cacheVitalStatusAndEvolveTo(nextVitalStatus){    
       let currentVitalStatus = this.getVitalStatus()
       this.#setCachedStatus(currentVitalStatus)
@@ -55,12 +70,14 @@ export default class Cell {
       return nextVitalStatus
     }
     
+    // determines the initial cell status (alive / dead)
     determineInitialVitalStatus(){
-      let initVitalStatus = Math.random() > 0.75
+      let initVitalStatus = Math.random() > constants.cellThresHold
       this.#setVitalStatus(initVitalStatus)
       return initVitalStatus
     }
 
+    // decides by the indicator which status gets used to calculate the next status for another cell
     determineVitalStatus(evolvedIndicator){
      return evolvedIndicator == this.#getEvolvedIndicator() ? 
        this.getVitalStatus() : this.#getCachedStatus()

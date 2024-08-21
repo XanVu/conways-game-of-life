@@ -2,33 +2,20 @@ import StyleManager from "./StyleManager.js";
 import * as constants from './Constants';
 import TableHandler from "./TableHandler.js";
 import controls from "./ControlsComponent.js";
-import tabs from "./TabComponent.js";
 
 let instance
 class TableComponent {
-  #tableWrapper
-  #statusWrapper
   #table
   #tableHandler
-
-  #stableIcon
-  #aliveIcon
-  #deadIcon
-  #repetitionIcon
-
 
   constructor(){
     if (instance)
       throw new Error("Singleton")
-    this.#tableWrapper = document.getElementById('table-wrapper')
-    this.#statusWrapper = document.getElementById('status-wrapper')
     this.#table = document.querySelector('table')
     instance = this 
   }
 
-  #getStatusWrapper(){
-    return this.#statusWrapper
-  }
+  // #region Getter
 
   #getTable(){
     return this.#table
@@ -38,70 +25,59 @@ class TableComponent {
     return this.#tableHandler
   }
 
-  #getAliveIcon(){
-    return this.#aliveIcon
-  }
+  // #endregion 
 
-  #getDeadIcon(){
-    return this.#deadIcon
-  }
-
-  #getStableIcon(){
-    return this.#stableIcon
-  }
-
-  #getRepetitionIcon(){
-    return this.#repetitionIcon
-  }
-
+  // #region Setter
 
   #setTableHandler(handler){
     this.#tableHandler = handler
   }
 
-  #setAliveIcon(icon){
-    this.#aliveIcon = icon
+  // #endregion
+
+  // triggers the loop function to start
+  #start(){
+    let handler = this.#getTableHandler()
+    handler.setIsLooping(true)
   }
 
-  #setDeadIcon(icon){
-    this.#deadIcon = icon
+  // brings the loop function to an halt
+  #stop(){
+    let handler = this.#getTableHandler()
+    handler.setIsLooping(false)
   }
 
-  #setStableIcon(icon){
-    this.#stableIcon = icon
-  }
-
-  #setRepetitionIcon(icon){
-    this.#repetitionIcon = icon
-  }
-
-
-    #deleteTableAndResetData(){ 
-      this.#setStarted(false)
-      let handler = this.#getTableHandler()
-      let rows = handler.getRowDepth()    
-      let columns = handler.getColumnDepth()
-      this.#truncateTable()
-      this.initTable(rows, columns)  
+  // resets the table and reinitilized it with the same dimensions (rows and columns)
+  #deleteTableAndResetData(){ 
+    this.#setStarted(false)
+    let handler = this.#getTableHandler()
+    let rows = handler.getRows()    
+    let columns = handler.getColumns()
+    this.#truncateTable()
+    this.initTable(rows, columns)  
     }
 
-      #truncateTable(){
+    // deletes the representation table
+    #truncateTable(){
         let table = this.#getTable()
         Array.from(table.rows).forEach(row => row.remove())
         return table
       }
     
+    // addes a row within an html table tag   
       #addRow(){
         let table = this.#getTable()
         let row = table.insertRow()
         return row
       }
 
+    // addes a cell into the row and adds a span to it to represent the dead or living cell
       #addCell(row, vitalStatus){
         let cell = row.insertCell()
         this.#createCellSpan(cell, vitalStatus)
       }
 
+    // creates a span element, sets the the circle css class  
       #createCellSpan(cell, vitalStatus){
         let span = document.createElement("span")
         StyleManager.addCssClass(span, 'circle')             
@@ -109,6 +85,7 @@ class TableComponent {
         StyleManager.styleCell(span, vitalStatus)
       }
 
+    // gets a cell by its position (row, column) and sets updates its status 
       refreshCell(row, col, vitalStatus){
         var table = this.#getTable()
         let cell = table.rows.item(row).cells.item(col)
@@ -116,33 +93,29 @@ class TableComponent {
         StyleManager.styleCell(span, vitalStatus)
       }
 
+    // initilizes the table array within the given dimensions, sets the handler and creates the starting configuration of the cells    
       initTable(rows, columns){
-        let table =  new TableHandler(rows, columns)
-        let statisticHandler = table.getStatisticHandler()
-        this.#setTableHandler(table)
-        table.createTableAndConfig(this.#addRow.bind(this), this.#addCell.bind(this))
-        let data = statisticHandler.getCurrentStatistics()
-        this.refreshStatisticTab(data)
+        let handler =  new TableHandler(rows, columns)
+        this.#setTableHandler(handler)
+        handler.createTableAndConfig(this.#addRow.bind(this), this.#addCell.bind(this))
       }
 
-      resizeEvent(){
+
+      #resizeEvent(){
         window.addEventListener('resize', () => {
         this.#stopEvolvingProcess()
         this.#truncateTable()
         let dim = this.calculateTableDimensions()
         this.initTable(dim.rows, dim.columns) 
-        this.#resetStatus()
         })
       }
 
       calculateTableDimensions(){
         let tableContainer = document.getElementById('table-wrapper')
-        let tablepaddingAndBorder = 16
-        let tdSize = 13
-    
         let clientWidth = tableContainer.clientWidth
         let clientHeight = tableContainer.clientHeight
-        
+        let tablepaddingAndBorder = 16
+        let tdSize = 13        
         let columns = Math.floor((clientWidth - tablepaddingAndBorder * 2 ) / tdSize)
         let rows = Math.floor((clientHeight - tablepaddingAndBorder * 2 - constants.tableOffset ) / tdSize)
 
@@ -170,74 +143,37 @@ class TableComponent {
        let start = controls.getStartButton()
        let stop = controls.getStopButton()
        let reset = controls.getResetButton()
-
        start.addEventListener(constants.click, this.#startEvolvingProcess.bind(this))
        stop.addEventListener(constants.click, this.#stopEvolvingProcess.bind(this)) 
        reset.addEventListener(constants.click, this.#resetEvolvingProcess.bind(this)) 
+       this.#resizeEvent()
       }
 
       #setStarted(bool){
         let table = this.#getTableHandler()
-        let conditionHandler = table.getConditionHandler()
-        conditionHandler.setStarted(bool)
+        table.setIsLooping(bool)
       }
 
       #startEvolvingProcess(){
-        this.#setStarted(true)
         let table = this.#getTableHandler()
+        this.#start()
         table.evolving()
         controls.hideStartButton()
         controls.showStopButton()
       }
   
       #stopEvolvingProcess(){   
-        this.#setStarted(false)
+        this.#stop()
         controls.resetControls()
       }
   
       #resetEvolvingProcess(){
         this.#deleteTableAndResetData()
-        this.#resetStatus()
         controls.resetControls()
     }
 
-    refreshStatisticTab(data){
-      tabs.refreshStatisticTab(data)
-    }
-
-
-    buildStatusContainer(){
-      let statusContainer = this.#getStatusWrapper()
-      let p = document.createElement('p')
-      p.textContent = 'Status '
-      statusContainer.appendChild(p)  
-
-      let aliveIcon = this.#buildIcon(constants.aliveIcon, constants.aliveColor)
-      let deadIcon = this.#buildIcon(constants.deadIcon, constants.deadColor)
-      let stableIcon = this.#buildIcon(constants.stableIcon, constants.stableColor)
-      let repetitionIcon = this.#buildIcon(constants.repetitionIcon, constants.repetitionColor)
-      
-      this.#setAliveIcon(aliveIcon)
-      this.#setDeadIcon(deadIcon)
-      this.#setStableIcon(stableIcon)
-      this.#setRepetitionIcon(repetitionIcon)
-
-      StyleManager.hideElments([deadIcon, stableIcon, repetitionIcon])
-      
-      statusContainer.appendChild(aliveIcon)
-      statusContainer.appendChild(deadIcon)
-      statusContainer.appendChild(stableIcon)
-      statusContainer.appendChild(repetitionIcon)
-    }
-
-
-    #buildIcon(type, color){
-    let span = document.createElement('span')  
-    let icon = document.createElement('i')
-    icon.style.color = color
-    icon.classList.add(...constants.iconAssets, type)
-    span.appendChild(icon)  
-    return span
+   hideControls(){
+    controls.hideControls()
    }
 
    resetControlsAndUpdateStatus(icon, icons){
@@ -245,37 +181,6 @@ class TableComponent {
         StyleManager.showElement(icon)
         StyleManager.hideElments(icons)
    }
-
-   #resetStatus(){
-    let aliveIcon = this.#getAliveIcon()
-    let deadIcon = this.#getDeadIcon()
-    let stableIcon = this.#getStableIcon()
-    let repetitionIcon = this.#getRepetitionIcon()
-    this.resetControlsAndUpdateStatus(aliveIcon, [deadIcon, stableIcon, repetitionIcon])
-   }
-
-    determineStatus(){
-      let table = this.#getTableHandler()
-      let conditionHandler = table.getConditionHandler()
-      let conditionFlags = conditionHandler.getConditionFlags()
-
-      let aliveIcon = this.#getAliveIcon()
-      let deadIcon = this.#getDeadIcon()
-      let stableIcon = this.#getStableIcon()
-      let repetitionIcon = this.#getRepetitionIcon()
-
-        if(!conditionFlags.isAlive){
-         this.resetControlsAndUpdateStatus(deadIcon, [aliveIcon, stableIcon, repetitionIcon])
-        }
-       
-        if(!conditionFlags.isEvolving){
-          this.resetControlsAndUpdateStatus(stableIcon, [aliveIcon, deadIcon, repetitionIcon])
-        }
-       
-        if(conditionFlags.isRepeatingPattern){
-          this.resetControlsAndUpdateStatus(repetitionIcon, [aliveIcon, deadIcon, stableIcon])
-        }
-      }
 }
 
 let tableComp = Object.freeze(new TableComponent());

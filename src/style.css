@@ -57,104 +57,6 @@ nav span {
 
 /* #endregion */
 
-/* #region Tabs */
-
-#tab-wrapper {
-  position: absolute;
-  top: 215px;
-  left: 0;
-  height: fit-content;
-  width: 100%;
-  z-index: 2;
-}
-
-.mobile-tab {
-  left:0;
-  right:0;
-  margin-left: auto;
-  margin-right: auto;
-  position: absolute;
-  width: fit-content;
-  min-width: 200px;
-  max-width: 60%;
-  background: linear-gradient(to left, #eea849,#f46b45);
-  color:white;
-  height: fit-content;
-  border-radius: 15px;
-  z-index: 2;
-  text-align: center;
-  padding: 20px;
-}  
-
-.mobile-tab p {
-  font-size: 1rem;
-  padding: 0px 10px;
-}
-
-.mobile-tab button {
- border: none;
-}
-
-h3{
-  font-size: 1.2rem;
-  text-decoration: underline;
-  text-align: center;
-}
-
-.close { 
-  box-sizing: border-box; 
-  -moz-box-sizing: border-box; 
-  display: inline-block;
-  position: absolute;
-  right: -22px;
-  top: -22px;
-  width: 44px; 
-  height: 44px; 
-  background: black;
-  border-radius: 50%; 
-  transition: background 0.5s;
-  z-index: 2;
-}
-
-.close:after,
-.close:before {
-  position: absolute;
-  content:"";
-  background-color: white;
-  border-radius: 2px;
-}
-
-.close:after {
-  width: 4px;
-  height: 20px;
-  top: 12px;
-  left: 20px;
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  -o-transform: rotate(45deg);
-  transform: rotate(45deg);
-}
-
-.close:before {
-  width: 20px;
-  height: 4px;
-  top: 20px;
-  left: 12px;
-  -webkit-transform: rotate(45deg);
-  -moz-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  -o-transform: rotate(45deg);
-  transform: rotate(45deg);
-}
-
-.close:hover {
-  background: black;
-}
-
-
-/* #endregion */
-
 /* #region Controls */
 
 #controls-wrapper {
@@ -195,18 +97,6 @@ table {
   width: 80%;
   margin: 25px auto;
   flex:1;
-}
-
-#status-wrapper {
-  display: flex;
-  position: relative;
-  width: 150px;
-  height: 50px;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  border-radius: 15px;
 }
 
 .circle {
