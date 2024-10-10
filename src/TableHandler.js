@@ -1,9 +1,17 @@
 import Cell from "./Cell.js";
 import tableComp from "./TableComponent.js";
 import controls from "./ControlsComponent.js";
+import * as constants from './Constants';
 
-//handles all the logic that is required, so traversing the 2D array and the looping function 
+/*
+This class handles the internal reprensentation of the grid
+in form of an 2 dimensional Array.
 
+- holds the value of the dimensions (rows, columns)
+- keeps track of the generation number
+- holds the 2D Array
+- the looping condition, per default false
+*/
 export default class TableHandler {  
   #table
   #rows
@@ -15,8 +23,14 @@ export default class TableHandler {
       this.#rows = rows
       this.#columns = columns
     }
+  
+  /* 
+  Getter/Setter/Incremental methods will not be 
+  explained as there trivial. It should be obvious 
+  what they are used for.
+  */
 
-  // #region Getter
+// #region Getter/Setter/Increments
 
     getTable(){
       return this.#table
@@ -29,10 +43,6 @@ export default class TableHandler {
     getColumns(){
       return this.#columns
     }
-
-  // #endregion Setter  
-
-  // #region Setter 
 
     setTable(table){
       this.#table = table 
@@ -49,10 +59,6 @@ export default class TableHandler {
     setIsLooping(bool){
       this.#isLooping = bool
     }
-
-  // #endregion  
-
-  // #region Increments
     
   #incrementGeneration(){
     ++this.#generation
@@ -61,7 +67,11 @@ export default class TableHandler {
   //#endregion
 
   
-  // builds a 2 dimensional array that will hold all the cells, sets the internal table variable
+  /*
+  This function builds the 2 dimensional array that 
+  will hold all the cells, sets the internal table variable
+  and initilised the cells in side the grid as all dead.
+  */ 
   #buildTable(){
     let rowDepth = this.getRows()
     let columnDepth = this.getColumns()
@@ -70,8 +80,19 @@ export default class TableHandler {
     return table
   }
 
-  // updates every cell within the table by getting the adjacent cells, calculate the living cells, validate the new cell status and refreshing the reprensentation table
-  // in the end we increment the generation variable
+  /*
+  A function which handles all actions needed within a discrete
+  time frame. Loops through the whole grid and executes following
+  steps for every cell in the grid.
+  - searches all adjacent cells of the selected cell
+  - counts the living cells from that adjacent cells
+  - calculates the next cell state according to the rules
+  - invokes a call back to the html table through the
+    TableComponent and updates the cells css
+  - finally after all actions for each cell in the grid are completed
+    we increase the generation number as every cell has evolved into
+    the next generation
+  */
   #refreshTable(){ 
     let array = this.getTable()   
     array.forEach((subarray, row) => subarray.forEach((cell, col) => {
@@ -84,30 +105,34 @@ export default class TableHandler {
     this.#incrementGeneration()      
   }
 
-
-  // evalutes the next cell status depending if the current status is alive or dead and uses the adjacent living cells of that cell to calculate the next status
-  // saves the calculation result within the cell and the old status gets saved in the cell cache 
-    #validateEvolution(cell, livingAdjacentCells){ 
-      let evolvedVitalStatus
+  /*
+  A function that evalutes the next cell status depending
+  on the current status of the cell and enforces the game
+  rules. Afterwards let the cell handle their internal states
+  and returns the new state.
+  */
+  #validateEvolution(cell, livingAdjacentCells){ 
+    let evolvedVitalStatus
       
-      if(cell.getVitalStatus()){
-        let isUnderpopulated = cell.isUnderpopulated(livingAdjacentCells)
-        let isOverpopulated = cell.isOverpopulated(livingAdjacentCells)
-        evolvedVitalStatus = !isUnderpopulated && !isOverpopulated
-      }
-      else 
-        evolvedVitalStatus = cell.isResurrected(livingAdjacentCells)
-  
-      cell.cacheVitalStatusAndEvolveTo(evolvedVitalStatus)
-      return evolvedVitalStatus
+    if(cell.getVitalStatus()){
+      let isUnderpopulated = cell.isUnderpopulated(livingAdjacentCells)
+      let isOverpopulated = cell.isOverpopulated(livingAdjacentCells)
+      evolvedVitalStatus = !isUnderpopulated && !isOverpopulated
     }
+    else 
+      evolvedVitalStatus = cell.isResurrected(livingAdjacentCells)
+    
+    cell.cacheVitalStatusAndEvolveTo(evolvedVitalStatus)
+    return evolvedVitalStatus
+  }
 
-
-  // Takes a point and calculates the adjacent points (cells)
-  // For the point (1,1) -> (0,0)(0,1)(0,2) (1,0)(1,1)(1,2) (2,0)(2,1)(2,2)
-  // Additionally this functions ensures valid values of the cells, so we dont get IndexOutOfBoundExceptions
-  // Afterwards we eliminate the identity of that list of points (1,1), we only want the surroundings points and transform these into cell coordinates
-
+  /*
+  A function that calculates the adjacent cells of a given cell.
+  Valid indices are garantueed by using the modulo operator.
+  After executing the cartesian product we only need to filter out
+  the position of our given cell to end up with only the neighbour
+  cells.
+  */
   #getAdjacentCells(row, col){
     let rowDepth = this.getRows()
     let columnDepth = this.getColumns()
@@ -121,35 +146,52 @@ export default class TableHandler {
     return adjacentCells
     }
 
-    // using the mod function we ensure that we only get positive values, which a within the size barrier
-    #calculateValidIndex(index, size){
-      return this.#mod(index, size)
-     }
+  /*
+  By calcuteding mod of our current index and the size of the array.
+  we ensure that we get a valid index number back.
+  */ 
+  #calculateValidIndex(index, size){
+    return this.#mod(index, size)
+  }
   
-    // a mod function 
-    #mod(a,b){
-      return a - (Math.floor(a / b) * b)
-    }
+  /*
+  A function that calculates modulo for two given numbers.
+  */
+  #mod(a,b){
+    return a - (Math.floor(a / b) * b)
+  }
 
-    // gets the cell within the table with a point (row, column)
-    #getCellbyCoordinate(row, col){
-      let table = this.getTable()
-          return table[row][col]
-    }
+  /*
+  Returns back a cell from the 2D array by using coordinates.
+  */
+  #getCellbyCoordinate(row, col){
+    let table = this.getTable()
+    return table[row][col]
+  }
 
 
-    // calculates a value that is equal to the number of cell which are alive
-    #calculateNumberOfLivingAdjacentCells(adjacentCells){
-      let gen = this.#generation
-      return adjacentCells.reduce((acc, cell) => {
-       return cell.determineVitalStatus(gen) ? ++acc : acc }, 0 );
-      }
+  /*
+  A function that utilizes an accumolator to count living cells.
+  By providing the generation number as an way to compare we ensure 
+  that only cached cell states or untouched cell values are foundation
+  for the calculation. Already updated cells would distort the result.
+  */ 
+  #calculateNumberOfLivingAdjacentCells(adjacentCells){
+  let gen = this.#generation
+  return adjacentCells.reduce((acc, cell) => {
+    return cell.determineVitalStatus(gen) ? ++acc : acc }, 0);
+  }
   
-   // a function with callbacks to the TableComponent to build the representation of the cell table within one loop only
-   createTableAndConfig(rowHook, columnHook){
-    let table = this.#buildTable() 
+  /*
+  While traversing the 2 dim array it creates the html rows and
+  cell by calling back to the tableComponent. It provides 2 placeholder
+  hooks, that will be use for the fitting function in the table component
+  class. Additionally, it initilizes all cells in the grid.
+  */
+  createTableAndConfig(rowHook, columnHook){
+  let table = this.#buildTable() 
   
-    table.forEach(subarray => {
+  table.forEach(subarray => {
       let row = rowHook()  
       subarray.forEach(cell => {
       let vitalStatus = cell.determineInitialVitalStatus()
@@ -157,14 +199,21 @@ export default class TableHandler {
     })})
   }
 
-    // the looping function refreshes the table as long it was set to looping and the generation is smaller than 500 else we stop and hide the controls
-    evolving(){
-      if(this.#isLooping && this.#generation <= 500){
-        this.#refreshTable()
-        setTimeout(this.evolving.bind(this), 25)
-      }
-      else if (this.#generation > 500) {
-        controls.hideControls()
-      }
+  /*
+  The looping function, basically an recursive endless loop, which can 
+  only be stopped by certain condition to be true.
+  - someone stops the loop manually
+  - the generation number is greater than the max value
+  While looping we repeat all actions needed for a cell and do 
+  that to each cell in the grid. Afterwards recursively calling the function
+  again till we come to an end. 
+  */
+  evolving(){
+    if(this.#isLooping && this.#generation <= constants.maxGeneration){
+      this.#refreshTable()
+      setTimeout(this.evolving.bind(this), constants.timeStep)
+    }
+    else if (this.#generation > constants.maxGeneration)
+      controls.hideControls() 
    }
 }
