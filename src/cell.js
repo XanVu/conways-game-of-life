@@ -1,79 +1,122 @@
-export default class Cell {
-    #nextStatus = false
-    #isAlive
-    #isUnderpopulated = null
-    #isOverpopulated = null
-    #reproduce = null
-    #Unchanged = false
+import * as constants from './Constants';
+
+/* 
+class that holds all neccessary information 
+about a cell and provide functions to validate
+adjacent cells
+
+- evolvedIndicator = indicates if a cell state has been 
+                     updated or not in the current 
+                     genereation
+- cachedStatus = old cell state
+- vitalStatus = current cell state
+*/
+export default class Cell { 
+    #evolvedIndicator = 1
+    #cachedStatus = false
+    #vitalStatus
     
-    constructor(isAlive){
-      this.#isAlive = isAlive
+    constructor(vitalStatus){
+      this.#vitalStatus = vitalStatus
     }
 
-    getUnchanged(){
-      return this.#Unchanged
+    /* 
+    Getter/Setter/Incremental methods will not be 
+    explained as there trivial. It should be obvious 
+    what they are used for.
+    */
+
+    // #region Getter/Setter/Incremental methods
+
+    #getEvolvedIndicator(){
+      return this.#evolvedIndicator
+    }
+    
+    #getCachedStatus(){
+      return this.#cachedStatus
+    }
+    
+    getVitalStatus(){
+      return this.#vitalStatus
+    }  
+
+    #setCachedStatus(status){
+      this.#cachedStatus = status
     }
 
-    getIsUnderpopulated(){
-      return this.#isUnderpopulated
+    #setVitalStatus(vitalStatus){
+      this.#vitalStatus = vitalStatus
     }
 
-    getIsOverpopulated(){
-      return this.#isOverpopulated
+    #incrementEvolvedIndicator(){
+      ++this.#evolvedIndicator
     }
 
-    getWillReproduce(){
-      return this.#reproduce
+    // #endregion 
+
+    /* 
+    Rule from the game:
+    a cell is underpopulated and dies if it 
+    has less than 2 adjacent living cells
+    */
+    isUnderpopulated(adjacentLivingCells){
+      return adjacentLivingCells < 2  
     }
 
-    getIsAlive(){
-      return this.#isAlive
+    /* 
+    Rule from the game:
+    a cell is overpopulated and dies if it 
+    has more than 3 adjacent living cells
+    */
+    isOverpopulated(adjacentLivingCells){
+      return adjacentLivingCells > 3
     }
 
-    #setNextStatus(nextStatus){
-      this.#nextStatus = nextStatus
+    /* 
+    Rule from the game:
+    cell gets resurrected back to life if 
+    it excatly 3 adjacent living cells
+    */
+    isResurrected(adjacentLivingCells){
+      return adjacentLivingCells == 3
+    }
+    
+    /* 
+    Saves the current status of the cell within cache
+    before applying the fresh calculated cell state on to 
+    current state. Afterwards increasing the evolution 
+    indicator, marking it as updated within the current 
+    generation of cells in the grid.
+    */
+    cacheVitalStatusAndEvolveTo(nextVitalStatus){    
+      let currentVitalStatus = this.getVitalStatus()
+      this.#setCachedStatus(currentVitalStatus)
+      this.#setVitalStatus(nextVitalStatus)
+      this.#incrementEvolvedIndicator()
+      return nextVitalStatus
+    }
+    
+    /* 
+    Function that creates the cell states (alive / dead)
+    for the initial grid configuration.
+    If a pseudorandom number between 0 and 1 lies beyound a
+    certain threshold the inital state will be true else false.
+    */
+    determineInitialVitalStatus(){
+      let initVitalStatus = Math.random() > constants.cellThresHold
+      this.#setVitalStatus(initVitalStatus)
+      return initVitalStatus
     }
 
-    evolve(){
-      this.#Unchanged = this.#isAlive == this.#nextStatus
-      this.#isAlive = this.#nextStatus
-    }
-
-    //Rules:
-
-    #isNotUnderpopulated(livingCells){
-      let isNotUnderpopulated = livingCells >= 2  
-      this.#isUnderpopulated = !isNotUnderpopulated
-      return isNotUnderpopulated
-    }
-
-    #isNotOverpopulated(livingCells){
-      let isNotOverpopulated = livingCells <= 3  
-      this.#isOverpopulated = !isNotOverpopulated
-      return isNotOverpopulated
-    }
-
-    #willReproduce(livingCells){
-      let willReproduce = livingCells == 3
-      this.#reproduce = willReproduce
-      return willReproduce
-    }
-
-  //Any live cell with two or three live neighbors lives on to the next generation.
-    #isSurvivingOnToTheNextGen(livingCells){    
-      let isAlive =  this.#isNotUnderpopulated(livingCells) && this.#isNotOverpopulated(livingCells)
-      this.#setNextStatus(isAlive)
-    }
-
-  //Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-    #isAliveByReproduction(livingCells){
-      let isAlive = this.#willReproduce(livingCells)
-      this.#setNextStatus(isAlive)
-    }
-
-    determineNextGenerationStatus(numberOfLivingNeigburs){
-      let status = this.getIsAlive();  
-      status ? this.#isSurvivingOnToTheNextGen(numberOfLivingNeigburs) 
-      : this.#isAliveByReproduction(numberOfLivingNeigburs)
+    /* 
+    Compares the evolution indicators to see if the current cell
+    was updated or is still untouched and returns a cell state value.
+    If the current cell state was already updated, we will use the 
+    cached/old cell state value as the calculation would be distorted 
+    by the new value.
+    */
+    determineVitalStatus(evolvedIndicator){
+     return evolvedIndicator == this.#getEvolvedIndicator() ? 
+       this.getVitalStatus() : this.#getCachedStatus()
     }
   }
