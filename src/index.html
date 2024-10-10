@@ -1,27 +1,29 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
+  <!--Title of the website-->
   <title>Conway game of life</title>
+  <!--Reference to the styles-->
   <link rel="stylesheet" href="style.css">
+  <!--Reference to the styles of the control buttons-->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <body>
-   
-<div id="flexContainer"> 
-  <nav>  
-    <span>CONWAY'S GAME OF LIFE</span> 
-    <div id="controls-wrapper"> </div>
-  </nav>
-
-  <div id="table-wrapper">
-    <table></table> 
-  </div>
-</div>
-
+  <!--Contains the whole site-->
+    <div id="flexContainer"> 
+        <nav>  
+            <span>CONWAY'S GAME OF LIFE</span> 
+            <!--Contains the control buttons (start, stop, reset)-->
+            <div id="controls-wrapper"> </div>
+        </nav>
+        <!--Wrapper for the table-->
+      <div id="table-wrapper">
+        <!--Table, which will be filled with the grid dynamically-->
+        <table></table> 
+      </div>
+    </div>
 </body>
-
-<script src="main.js"></script>
+<!--Reference to the javascript Main.js file-->
+<script src="Main.js"></script>
 </html>
