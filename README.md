@@ -7,4 +7,3 @@ The project contains a launching config.
 
 Execute npm in the project directory by calling nmp start and
 then you can debug using chrome.
-
